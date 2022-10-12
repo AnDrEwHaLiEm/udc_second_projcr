@@ -1,0 +1,16 @@
+{
+    "dev":{
+        "driver":"pg",
+        "host":"127.0.0.1",
+        "database":"udc_second_project",
+        "user":"postgres",
+        "password":"postgres"
+    },
+    "test":{
+        "driver":"pg",
+        "host":"127.0.0.1",
+        "database":"udc_second_project_test",
+        "user":"postgres",
+        "password":"postgres"
+    }
+}
