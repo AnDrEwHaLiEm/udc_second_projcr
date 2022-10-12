@@ -16,7 +16,7 @@ exports.setup = function (options, seedLink) {
     Promise = options.Promise;
 };
 exports.up = function (db) {
-    var filePath = path.join(__dirname, 'sqls', '20221011121700-producr-up.sql');
+    var filePath = path.join(__dirname, 'sqls', '20221012173254-productTable-up.sql');
     return new Promise(function (resolve, reject) {
         fs.readFile(filePath, { encoding: 'utf-8' }, function (err, data) {
             if (err)
@@ -30,7 +30,7 @@ exports.up = function (db) {
     });
 };
 exports.down = function (db) {
-    var filePath = path.join(__dirname, 'sqls', '20221011121700-producr-down.sql');
+    var filePath = path.join(__dirname, 'sqls', '20221012173254-productTable-down.sql');
     return new Promise(function (resolve, reject) {
         fs.readFile(filePath, { encoding: 'utf-8' }, function (err, data) {
             if (err)

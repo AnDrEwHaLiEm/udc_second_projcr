@@ -5,3 +5,4 @@ CREATE TABLE products(
     product_quantity INT NOT NULL default 0,
     product_price  DECIMAL(13, 2) NOT NULL
 );
+

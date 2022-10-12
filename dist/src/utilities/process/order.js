@@ -189,7 +189,6 @@ var Order = /** @class */ (function () {
                         product_price = result.rows[0].product_price;
                         total_price = product_quantity * product_price;
                         req.body.total_price = total_price;
-                        console.log(total_price);
                         next();
                         return [3 /*break*/, 6];
                     case 5:

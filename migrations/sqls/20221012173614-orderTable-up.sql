@@ -1,4 +1,5 @@
 /* Replace with your SQL commands */
+
 CREATE TABLE orders(
     userid INT,
     productid INT, 
@@ -8,4 +9,3 @@ CREATE TABLE orders(
     foreign key (userID) references users(user_id) ON DELETE CASCADE,
     foreign key (productID) references products(product_id)ON DELETE CASCADE
 );
-

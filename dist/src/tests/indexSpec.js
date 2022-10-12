@@ -301,7 +301,7 @@ describe('Product Tests', function () {
     }); });
 });
 describe('order Test', function () {
-    it('add new product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('add new Order', function () { return __awaiter(void 0, void 0, void 0, function () {
         var req, result;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -318,7 +318,7 @@ describe('order Test', function () {
             }
         });
     }); });
-    it('add new product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('add the Same Order', function () { return __awaiter(void 0, void 0, void 0, function () {
         var req, result;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -335,7 +335,7 @@ describe('order Test', function () {
             }
         });
     }); });
-    it('get one product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('get one product from One User', function () { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -368,7 +368,7 @@ describe('order Test', function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
-                        .delete("/order/delete/1")
+                        .delete("/order/delete/".concat(otherProduct))
                         .set('authorization', clientToken)];
                 case 1:
                     result = _a.sent();
