@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var order_1 = __importDefault(require("../process/order"));
 var orderRouter = express_1.default.Router();
-orderRouter.post('/add', order_1.default.checkProductExist, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+orderRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -53,14 +53,14 @@ orderRouter.post('/add', order_1.default.checkProductExist, function (req, res) 
         }
     });
 }); });
-orderRouter.get('/getOne/:product_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+orderRouter.get('/getOne/:order_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, order_1.default.getOne(req)];
             case 1:
                 result = _a.sent();
-                if (result.product_id === '-1')
+                if (result.order_id === '-1')
                     return [2 /*return*/, res.status(404).send('Not Found')];
                 return [2 /*return*/, res.send(result)];
         }
@@ -74,17 +74,6 @@ orderRouter.get('/getAll', function (req, res) { return __awaiter(void 0, void 0
             case 1:
                 result = _a.sent();
                 return [2 /*return*/, res.send(result)];
-        }
-    });
-}); });
-orderRouter.delete('/delete/:product_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, order_1.default.delete(req)];
-            case 1:
-                response = _a.sent();
-                return [2 /*return*/, res.status(response.state).send(response.text)];
         }
     });
 }); });

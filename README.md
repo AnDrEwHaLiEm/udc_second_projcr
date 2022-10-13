@@ -70,11 +70,19 @@ Database schema with column name and type =>{
         product_price  DECIMAL,
     }
     orders{
-        userid INT forgin key,
-        productid INT forgin key, 
-         product_quantity INT,
-        total_price INT,
-        PRIMARY KEY (userid, productid),
+         order_id SERIAL PRIMARY KEY,
+         user_id INT,
+         total_price DECIMAL(12,2),
+         foreign key (user_id) references users(user_id) ON DELETE CASCADE
+    }
+    order_product{
+        order_id  INT,
+        product_id INT,
+        quantity INT,
+        price DECIMAL(12,2),
+        PRIMARY KEY(order_id,product_id),
+        foreign key (order_id) references orders(order_id) ON DELETE CASCADE,
+        foreign key (product_id) references products(product_id) ON DELETE CASCADE
     }
 }
 
@@ -153,8 +161,9 @@ End Point--->{
             POST/order/add
             body
             { 
-                product_id: string,
-                product_quantity: number
+                products: [
+                    { product_id: number, product_quantity: number },
+                ],
             }
             header
             {
@@ -164,7 +173,7 @@ End Point--->{
         }
         get One Order
         {
-            GET/order/getOne/:product_id
+            GET/order/getOne/:order_id
             header
             {
                 'authorization' : clientToken  ===> clientToken should start with '123=' then token that come to you when log in
@@ -180,16 +189,7 @@ End Point--->{
                 ===> (must be a client not admin)
             }
         }
-    
-        delete One Order
-        {
-            DELETE/order/delete/:product_id
-            header
-            {
-                'authorization' : clientToken  ===> clientToken should start with '123=' then token that come to you when log in
-                ===> (must be a client not admin)
-            }
-        }
+
     }
 }
 

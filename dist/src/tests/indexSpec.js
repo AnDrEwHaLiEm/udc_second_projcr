@@ -44,7 +44,6 @@ var __1 = __importDefault(require("../"));
 var request = (0, supertest_1.default)(__1.default);
 var AdminToken = '123=';
 var clientToken = '123=';
-var otherProduct;
 describe('User Tests', function () {
     it('login with main admin', function () { return __awaiter(void 0, void 0, void 0, function () {
         var req, response;
@@ -136,7 +135,6 @@ describe('User Tests', function () {
     }); });
 });
 describe('Product Tests', function () {
-    var productid;
     it('Admin Create  product', function () { return __awaiter(void 0, void 0, void 0, function () {
         var productData, response;
         return __generator(this, function (_a) {
@@ -144,28 +142,6 @@ describe('Product Tests', function () {
                 case 0:
                     productData = {
                         product_name: 'Chipsi',
-                        product_price: 100,
-                        product_quantity: 100,
-                    };
-                    return [4 /*yield*/, request
-                            .post('/product/create')
-                            .send(productData)
-                            .set('authorization', AdminToken)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toEqual(200);
-                    expect(response.text).toEqual('Success');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('Admin Create  product', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var productData, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    productData = {
-                        product_name: 'Break',
                         product_price: 100,
                         product_quantity: 100,
                     };
@@ -209,7 +185,7 @@ describe('Product Tests', function () {
             switch (_a.label) {
                 case 0:
                     productData = {
-                        product_id: 1,
+                        product_id: 4,
                         product_name: 'Tiger',
                         product_price: 100,
                         product_quantity: 100,
@@ -233,13 +209,11 @@ describe('Product Tests', function () {
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(200);
-                    productid = response.body[0].product_id;
-                    otherProduct = response.body[1].product_id;
                     expect(response.body.length).toBeTruthy();
                     expect(response.body[0].product_id).toBeTruthy();
                     expect(response.body[0].product_name).toBeTruthy();
                     expect(response.body[0].product_price).toBeTruthy();
-                    expect(response.body[0].product_quantity).toEqual(100);
+                    expect(response.body[0].product_quantity).toBeTruthy();
                     return [2 /*return*/];
             }
         });
@@ -248,16 +222,20 @@ describe('Product Tests', function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, request.get("/product/getOne/".concat(productid))];
+                case 0: return [4 /*yield*/, request.get("/product/getOne/1")];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(200);
-                    expect(response.body.product_id).toEqual(productid);
+                    expect(response.body.product_id).toEqual(1);
+                    expect(response.body.product_name).toEqual('Apple');
+                    expect(response.body.product_price).toEqual('10.00');
+                    expect(response.body.product_quantity).toBeLessThanOrEqual(60);
+                    expect(response.body.product_quantity).toBeGreaterThanOrEqual(0);
                     return [2 /*return*/];
             }
         });
     }); });
-    it('Any One   get Not Exist One Product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Any One get Not Exist One Product', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -275,7 +253,7 @@ describe('Product Tests', function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
-                        .delete("/product/delete/".concat(productid))
+                        .delete("/product/delete/4")
                         .set('authorization', AdminToken)];
                 case 1:
                     response = _a.sent();
@@ -289,7 +267,7 @@ describe('Product Tests', function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
-                        .delete("/product/delete/".concat(productid))
+                        .delete("/product/delete/4")
                         .set('authorization', clientToken)];
                 case 1:
                     response = _a.sent();
@@ -306,7 +284,13 @@ describe('order Test', function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    req = { product_id: otherProduct, product_quantity: 20 };
+                    req = {
+                        products: [
+                            { product_id: 1, product_quantity: 2 },
+                            { product_id: 2, product_quantity: 3 },
+                            { product_id: 3, product_quantity: 4 },
+                        ],
+                    };
                     return [4 /*yield*/, request
                             .post('/order/add')
                             .send(req)
@@ -318,29 +302,12 @@ describe('order Test', function () {
             }
         });
     }); });
-    it('add the Same Order', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, result;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    req = { product_id: otherProduct, product_quantity: 150 };
-                    return [4 /*yield*/, request
-                            .post('/order/add')
-                            .send(req)
-                            .set('authorization', clientToken)];
-                case 1:
-                    result = _a.sent();
-                    expect(result.status).toEqual(404);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('get one product from One User', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('get one order ', function () { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
-                        .get("/order/getOne/".concat(otherProduct))
+                        .get("/order/getOne/1")
                         .set('authorization', clientToken)];
                 case 1:
                     result = _a.sent();
@@ -355,20 +322,6 @@ describe('order Test', function () {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
                         .get("/order/getAll")
-                        .set('authorization', clientToken)];
-                case 1:
-                    result = _a.sent();
-                    expect(result.status).toEqual(200);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('delete one order from one user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var result;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request
-                        .delete("/order/delete/".concat(otherProduct))
                         .set('authorization', clientToken)];
                 case 1:
                     result = _a.sent();
