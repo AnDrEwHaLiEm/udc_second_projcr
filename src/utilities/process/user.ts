@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import DefaultResponseInterface from '../DefaultResponseInterface';
 import DefaultRespons from '../DefaultRespons';
-import client from '../../dataBase';
+import {client} from '../../dataBase';
 
 class User {
   /*async deleteModelsById(req: Request): Promise<DefaultResponseInterface> {

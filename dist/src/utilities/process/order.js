@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var dataBase_1 = __importDefault(require("../../dataBase"));
+var dataBase_1 = require("../../dataBase");
 var DefaultRespons_1 = __importDefault(require("../DefaultRespons"));
 var Order = /** @class */ (function () {
     function Order() {
@@ -61,7 +61,7 @@ var Order = /** @class */ (function () {
                                         case 0:
                                             product_id = element.product_id, product_quantity = element.product_quantity;
                                             query = "SELECT product_price,product_quantity FROM products WHERE product_id='".concat(product_id, "';");
-                                            return [4 /*yield*/, dataBase_1.default.connect()];
+                                            return [4 /*yield*/, dataBase_1.client.connect()];
                                         case 1:
                                             conn = _a.sent();
                                             return [4 /*yield*/, conn.query(query)];
@@ -72,7 +72,7 @@ var Order = /** @class */ (function () {
                                                 product_quantity >= 1)) return [3 /*break*/, 5];
                                             remender = result.rows[0].product_quantity - product_quantity;
                                             query_1 = "UPDATE products SET product_quantity='".concat(remender, "' WHERE product_id='").concat(product_id, "';");
-                                            return [4 /*yield*/, dataBase_1.default.connect()];
+                                            return [4 /*yield*/, dataBase_1.client.connect()];
                                         case 3:
                                             conn_1 = _a.sent();
                                             return [4 /*yield*/, conn_1.query(query_1)];
@@ -100,7 +100,7 @@ var Order = /** @class */ (function () {
                     case 1:
                         _b.sent();
                         multiQuery = multiQuery.slice(0, -1) + ';';
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 2:
                         conn = _b.sent();
                         return [4 /*yield*/, conn.query(multiQuery)];
@@ -125,7 +125,7 @@ var Order = /** @class */ (function () {
                         _a.trys.push([1, 7, , 8]);
                         _id = req.body.decodedToken._id;
                         query = "INSERT INTO orders(user_id) Values('".concat(_id, "') RETURNING order_id;");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 2:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -137,7 +137,7 @@ var Order = /** @class */ (function () {
                     case 4:
                         _a.sent();
                         secondQuery = "UPDATE orders SET total_price =".concat(req.body.total_price, " WHERE order_id ='").concat(req.body.order_id, "';");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 5:
                         conn2 = _a.sent();
                         return [4 /*yield*/, conn2.query(secondQuery)];
@@ -166,7 +166,7 @@ var Order = /** @class */ (function () {
                     case 0:
                         _id = req.body.decodedToken._id;
                         query = "SELECT orders.order_id,orders.total_price,jsonb_agg(\n    JSON_BUILD_OBJECT(\n\t\t'product_id',order_product.product_id,\n\t\t'product_name',products.product_name,\n\t\t'quantity',order_product.quantity,\n\t\t'price',order_product.price\n    )) as product_info FROM orders\n    INNER JOIN order_product ON order_product.order_id = orders.order_id\n    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.user_id = '".concat(_id, "'\n    GROUP  BY orders.order_id,orders.total_price;");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -187,7 +187,7 @@ var Order = /** @class */ (function () {
                     case 0:
                         order_id = req.params.order_id;
                         query = "SELECT orders.order_id,orders.total_price,jsonb_agg(\n    JSON_BUILD_OBJECT(\n\t\t'product_id',order_product.product_id,\n\t\t'product_name',products.product_name,\n\t\t'quantity',order_product.quantity,\n\t\t'price',order_product.price\n    )) as product_info FROM orders\n    INNER JOIN order_product ON order_product.order_id = orders.order_id\n    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.order_id = '".concat(order_id, "'\n    GROUP  BY orders.order_id,orders.total_price;");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];

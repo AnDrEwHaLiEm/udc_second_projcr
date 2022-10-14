@@ -35,11 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var dataBase_1 = __importDefault(require("../../dataBase"));
+var dataBase_1 = require("../../dataBase");
 var authorities = {
     admin: {
         user: '*',
@@ -62,7 +59,7 @@ function checkAuthorty(req, res, next) {
                     method = req.method;
                     _id = req.body.decodedToken._id;
                     query = "SELECT admin_authority FROM users WHERE user_id='".concat(_id, "'");
-                    return [4 /*yield*/, dataBase_1.default.connect()];
+                    return [4 /*yield*/, dataBase_1.client.connect()];
                 case 1:
                     conn = _a.sent();
                     return [4 /*yield*/, conn.query(query)];

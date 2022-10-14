@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var dataBase_1 = __importDefault(require("../../dataBase"));
+var dataBase_1 = require("../../dataBase");
 var DefaultRespons_1 = __importDefault(require("../DefaultRespons"));
 var Product = /** @class */ (function () {
     function Product() {
@@ -56,7 +56,7 @@ var Product = /** @class */ (function () {
                         _b.trys.push([1, 4, , 5]);
                         _a = req.body, product_name = _a.product_name, product_price = _a.product_price, product_quantity = _a.product_quantity;
                         query = "INSERT INTO products(product_name,product_price,product_quantity) VALUES ('".concat(product_name, "','").concat(product_price, "','").concat(product_quantity, "');");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 2:
                         conn = _b.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -88,7 +88,7 @@ var Product = /** @class */ (function () {
                         _b.trys.push([1, 4, , 5]);
                         _a = req.body, product_id = _a.product_id, product_name = _a.product_name, product_price = _a.product_price, product_quantity = _a.product_quantity;
                         query = "UPDATE products SET product_name = '".concat(product_name, "',product_price='").concat(product_price, "',product_quantity='").concat(product_quantity, "' WHERE product_id='").concat(product_id, "';");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 2:
                         conn = _b.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -116,7 +116,7 @@ var Product = /** @class */ (function () {
                         _a.trys.push([0, 3, , 4]);
                         _id = req.params._id;
                         query = "DELETE FROM products WHERE product_id='".concat(_id, "';");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -140,7 +140,7 @@ var Product = /** @class */ (function () {
                     case 0:
                         _id = req.params._id;
                         query = "SELECT * FROM products WHERE product_id='".concat(_id, "';");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -168,7 +168,7 @@ var Product = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         query = 'SELECT * from products';
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];

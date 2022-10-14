@@ -8,3 +8,5 @@ CREATE TABLE order_product (
     foreign key (order_id) references orders(order_id) ON DELETE CASCADE,
     foreign key (product_id) references products(product_id) ON DELETE CASCADE
 );
+
+

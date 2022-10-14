@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
 var dotenv_1 = __importDefault(require("dotenv"));
-var dataBase_1 = __importDefault(require("../../dataBase"));
+var dataBase_1 = require("../../dataBase");
 dotenv_1.default.config();
 var Authintication = /** @class */ (function () {
     function Authintication() {
@@ -69,7 +69,7 @@ var Authintication = /** @class */ (function () {
                     case 0:
                         _a = req.body, user_email = _a.user_email, password = _a.password;
                         query = "SELECT user_id,user_password from users WHERE user_email='".concat(user_email, "'");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _b.sent();
                         return [4 /*yield*/, conn.query(query)];

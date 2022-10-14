@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import client from '../../dataBase';
+import {client} from '../../dataBase';
 import DefaultRespons from '../DefaultRespons';
 import DefaultResponseInterface from '../DefaultResponseInterface';
 import productModel from '../model/productModel';

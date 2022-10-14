@@ -41,7 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
 var DefaultRespons_1 = __importDefault(require("../DefaultRespons"));
-var dataBase_1 = __importDefault(require("../../dataBase"));
+var dataBase_1 = require("../../dataBase");
 var User = /** @class */ (function () {
     function User() {
     }
@@ -92,7 +92,7 @@ var User = /** @class */ (function () {
                     case 0:
                         user_email = req.body.user_email;
                         query = "SELECT * FROM users WHERE user_email='".concat(user_email, "';");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];
@@ -122,7 +122,7 @@ var User = /** @class */ (function () {
                         _b.trys.push([1, 4, , 5]);
                         _a = req.body, user_name = _a.user_name, user_email = _a.user_email, user_password = _a.user_password, admin_authority = _a.admin_authority;
                         query = "INSERT INTO users(user_name,user_email,user_password,admin_authority) VALUES (\n                            '".concat(user_name, "', '").concat(user_email, "', '").concat(user_password, "', '").concat(admin_authority, "');");
-                        return [4 /*yield*/, dataBase_1.default.connect()];
+                        return [4 /*yield*/, dataBase_1.client.connect()];
                     case 2:
                         conn = _b.sent();
                         return [4 /*yield*/, conn.query(query)];
