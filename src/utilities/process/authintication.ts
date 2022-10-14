@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import {client} from '../../dataBase';
+import { client } from '../../dataBase';
 dotenv.config();
 
 class Authintication {

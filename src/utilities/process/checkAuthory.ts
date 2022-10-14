@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import {client} from '../../dataBase';
+import { client } from '../../dataBase';
 interface LooseObject {
   [key: string]: {
     [key: string]: string | string[] | null;

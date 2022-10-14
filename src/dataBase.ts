@@ -1,7 +1,7 @@
-import dotenv from 'dotenv'
-import { Pool } from 'pg'
+import dotenv from 'dotenv';
+import { Pool } from 'pg';
 
-dotenv.config()
+dotenv.config();
 
 const {
   POSTGRES_HOST,
@@ -10,9 +10,9 @@ const {
   POSTGRES_PASSWORD,
   POSTGRES_TEST_DB,
   ENV,
-} = process.env
+} = process.env;
 
-console.log(ENV)
+console.log(ENV);
 
 let client: Pool;
 
