@@ -35,12 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var dataBase_1 = require("../../dataBase");
-var DefaultRespons_1 = __importDefault(require("../DefaultRespons"));
 var Order = /** @class */ (function () {
     function Order() {
     }
@@ -113,54 +109,46 @@ var Order = /** @class */ (function () {
             });
         });
     };
-    Order.prototype.addNewProduct = function (req) {
+    Order.prototype.addNewProduct = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var res, _id, query, conn, result, secondQuery, conn2, error_1;
+            var _id, query, conn, result, secondQuery, conn2, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        res = new DefaultRespons_1.default();
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 7, , 8]);
+                        _a.trys.push([0, 6, , 7]);
                         _id = req.body.decodedToken._id;
                         query = "INSERT INTO orders(user_id) Values('".concat(_id, "') RETURNING order_id;");
                         return [4 /*yield*/, dataBase_1.client.connect()];
-                    case 2:
+                    case 1:
                         conn = _a.sent();
                         return [4 /*yield*/, conn.query(query)];
-                    case 3:
+                    case 2:
                         result = _a.sent();
                         conn.release();
                         req.body.order_id = result.rows[0].order_id;
                         return [4 /*yield*/, this.addProductToOrder(req)];
-                    case 4:
+                    case 3:
                         _a.sent();
                         secondQuery = "UPDATE orders SET total_price =".concat(req.body.total_price, " WHERE order_id ='").concat(req.body.order_id, "';");
                         return [4 /*yield*/, dataBase_1.client.connect()];
-                    case 5:
+                    case 4:
                         conn2 = _a.sent();
                         return [4 /*yield*/, conn2.query(secondQuery)];
-                    case 6:
+                    case 5:
                         _a.sent();
                         conn2.release();
-                        res.state = 200;
-                        res.text = 'Success';
-                        return [2 /*return*/, res];
-                    case 7:
+                        return [2 /*return*/, res.send('Success')];
+                    case 6:
                         error_1 = _a.sent();
-                        res.state = 400;
-                        res.text = "Error ".concat(error_1);
-                        console.log(res.text);
-                        return [2 /*return*/, res];
-                    case 8: return [2 /*return*/];
+                        return [2 /*return*/, res.status(400).send("error ".concat(error_1))];
+                    case 7: return [2 /*return*/];
                 }
             });
         });
     };
-    Order.prototype.getAll = function (req) {
+    Order.prototype.getAll = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _id, query, conn, result, returnResult;
+            var _id, query, conn, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -173,13 +161,12 @@ var Order = /** @class */ (function () {
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        returnResult = result.rows;
-                        return [2 /*return*/, returnResult];
+                        return [2 /*return*/, res.send({ result: result.rows })];
                 }
             });
         });
     };
-    Order.prototype.getOne = function (req) {
+    Order.prototype.getOne = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var order_id, query, conn, result;
             return __generator(this, function (_a) {
@@ -195,15 +182,9 @@ var Order = /** @class */ (function () {
                         result = _a.sent();
                         conn.release();
                         if (result.rows.length) {
-                            return [2 /*return*/, result.rows[0]];
+                            return [2 /*return*/, res.send({ result: result.rows[0] })];
                         }
-                        return [2 /*return*/, {
-                                order_id: '-1',
-                                product_info: [
-                                    { product_name: '', product_id: '', quantity: 0, price: 0 },
-                                ],
-                                total_price: -1,
-                            }];
+                        return [2 /*return*/, res.status(404).send('Not Found')];
                 }
             });
         });

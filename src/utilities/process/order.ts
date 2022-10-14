@@ -1,8 +1,5 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { client } from '../../dataBase';
-import DefaultRespons from '../DefaultRespons';
-import DefaultResponseInterface from '../DefaultResponseInterface';
-import OrderModel from '../model/orderModel';
 
 class Order {
   async addProductToOrder(req: Request): Promise<void> {
@@ -51,8 +48,7 @@ class Order {
     req.body.total_price = total_price;
   }
 
-  async addNewProduct(req: Request): Promise<DefaultResponseInterface> {
-    const res = new DefaultRespons();
+  async addNewProduct(req: Request, res: Response): Promise<Response> {
     try {
       const { _id } = req.body.decodedToken;
       const query = `INSERT INTO orders(user_id) Values('${_id}') RETURNING order_id;`;
@@ -65,18 +61,13 @@ class Order {
       const conn2 = await client.connect();
       await conn2.query(secondQuery);
       conn2.release();
-      res.state = 200;
-      res.text = 'Success';
-      return res;
+      return res.send('Success');
     } catch (error) {
-      res.state = 400;
-      res.text = `Error ${error}`;
-      console.log(res.text);
-      return res;
+      return res.status(400).send(`error ${error}`);
     }
   }
 
-  async getAll(req: Request): Promise<Array<OrderModel>> {
+  async getAll(req: Request, res: Response): Promise<Response> {
     const { _id } = req.body.decodedToken;
     const query = `SELECT orders.order_id,orders.total_price,jsonb_agg(
     JSON_BUILD_OBJECT(
@@ -91,11 +82,10 @@ class Order {
     const conn = await client.connect();
     const result = await conn.query(query);
     conn.release();
-    const returnResult = result.rows;
-    return returnResult;
+    return res.send({ result: result.rows });
   }
 
-  async getOne(req: Request): Promise<OrderModel> {
+  async getOne(req: Request, res: Response): Promise<Response> {
     const { order_id } = req.params;
     const query = `SELECT orders.order_id,orders.total_price,jsonb_agg(
     JSON_BUILD_OBJECT(
@@ -111,15 +101,9 @@ class Order {
     const result = await conn.query(query);
     conn.release();
     if (result.rows.length) {
-      return result.rows[0];
+      return res.send({ result: result.rows[0] });
     }
-    return {
-      order_id: '-1',
-      product_info: [
-        { product_name: '', product_id: '', quantity: 0, price: 0 },
-      ],
-      total_price: -1,
-    };
+    return res.status(404).send('Not Found');
   }
 }
 

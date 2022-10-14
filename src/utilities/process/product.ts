@@ -1,30 +1,22 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { client } from '../../dataBase';
-import DefaultRespons from '../DefaultRespons';
-import DefaultResponseInterface from '../DefaultResponseInterface';
 import productModel from '../model/productModel';
 
 class Product {
-  async createNewProduct(req: Request): Promise<DefaultResponseInterface> {
-    const res = new DefaultRespons();
+  async createNewProduct(req: Request, res: Response): Promise<Response> {
     try {
       const { product_name, product_price, product_quantity } = req.body;
       const query = `INSERT INTO products(product_name,product_price,product_quantity) VALUES ('${product_name}','${product_price}','${product_quantity}');`;
       const conn = await client.connect();
       await conn.query(query);
       conn.release();
-      res.state = 200;
-      res.text = 'Success';
-      return res;
+      return res.send('Success');
     } catch (error) {
-      res.state = 400;
-      res.text = `Error ${error}`;
-      return res;
+      return res.status(400).send(`Error ${error}`);
     }
   }
 
-  async edit(req: Request): Promise<DefaultRespons> {
-    const res = new DefaultRespons();
+  async edit(req: Request, res: Response): Promise<Response> {
     try {
       const { product_id, product_name, product_price, product_quantity } =
         req.body;
@@ -32,58 +24,49 @@ class Product {
       const conn = await client.connect();
       await conn.query(query);
       conn.release();
-      res.text = 'Success';
-      return res;
+      return res.send('Success');
     } catch (error) {
-      res.state = 400;
-      res.text = `Error ${error}`;
-      return res;
+      return res.status(400).send(`Error ${error}`);
     }
   }
 
-  async delete(req: Request): Promise<DefaultRespons> {
+  async delete(req: Request, res: Response): Promise<Response> {
     try {
       const { _id } = req.params;
       const query = `DELETE FROM products WHERE product_id='${_id}';`;
       const conn = await client.connect();
       await conn.query(query);
       conn.release();
-      return { state: 200, text: 'DELETED' };
+      return res.send('DELETED');
     } catch (error) {
-      return { state: 400, text: `Error ${error}` };
+      return res.status(400).send(`Error ${error}`);
     }
   }
 
-  async getOne(req: Request): Promise<productModel> {
+  async getOne(req: Request, res: Response): Promise<Response> {
     const { _id } = req.params;
     const query = `SELECT * FROM products WHERE product_id='${_id}';`;
     const conn = await client.connect();
     const result = await conn.query(query);
     conn.release();
     if (result.rows.length) {
-      const returnResult = result.rows[0];
-      return returnResult;
+      return res.send({ result: result.rows[0] });
     }
 
-    return {
-      product_id: '-1',
-      product_name: '-1',
-      product_quantity: -1,
-      product_price: -1,
-    };
+    return res.status(404).send('Not Found');
   }
 
-  async getAll(): Promise<Array<productModel>> {
+  async getAll(res: Response): Promise<Response> {
     const query = 'SELECT * from products';
     const conn = await client.connect();
-    const result = await conn.query(query);
+    const products = await conn.query(query);
     conn.release();
-    const returnResult = result.rows.map((element: productModel) => {
+    const result = products.rows.map((element: productModel) => {
       const { product_id, product_name, product_price, product_quantity } =
         element;
       return { product_id, product_name, product_price, product_quantity };
     });
-    return returnResult;
+    return res.send({ result });
   }
 }
 

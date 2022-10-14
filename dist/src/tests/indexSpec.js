@@ -202,35 +202,36 @@ describe('Product Tests', function () {
         });
     }); });
     it('any One show Products', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var response, product;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get('/product/getAll')];
                 case 1:
                     response = _a.sent();
+                    product = response.body.result[0];
                     expect(response.status).toEqual(200);
-                    expect(response.body.length).toBeTruthy();
-                    expect(response.body[0].product_id).toBeTruthy();
-                    expect(response.body[0].product_name).toBeTruthy();
-                    expect(response.body[0].product_price).toBeTruthy();
-                    expect(response.body[0].product_quantity).toBeTruthy();
+                    expect(response.body.result.length).toEqual(4);
+                    expect(product.product_id).toEqual(1);
+                    expect(product.product_name).toEqual('Apple');
+                    expect(product.product_price).toEqual('10.00');
+                    expect(product.product_quantity).toEqual(60);
                     return [2 /*return*/];
             }
         });
     }); });
     it('Any One get Exist One Product', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var response, product;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get("/product/getOne/1")];
                 case 1:
                     response = _a.sent();
+                    product = response.body.result;
                     expect(response.status).toEqual(200);
-                    expect(response.body.product_id).toEqual(1);
-                    expect(response.body.product_name).toEqual('Apple');
-                    expect(response.body.product_price).toEqual('10.00');
-                    expect(response.body.product_quantity).toBeLessThanOrEqual(60);
-                    expect(response.body.product_quantity).toBeGreaterThanOrEqual(0);
+                    expect(product.product_id).toEqual(1);
+                    expect(product.product_name).toEqual('Apple');
+                    expect(product.product_price).toEqual('10.00');
+                    expect(product.product_quantity).toEqual(60);
                     return [2 /*return*/];
             }
         });
@@ -303,7 +304,7 @@ describe('order Test', function () {
         });
     }); });
     it('get one order ', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var result;
+        var result, order;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
@@ -311,13 +312,19 @@ describe('order Test', function () {
                         .set('authorization', clientToken)];
                 case 1:
                     result = _a.sent();
+                    order = result.body.result;
                     expect(result.status).toEqual(200);
+                    expect(order.total_price).toEqual('68.00');
+                    expect(order.product_info[0].product_id).toEqual(1);
+                    expect(order.product_info[0].product_name).toEqual('Apple');
+                    expect(order.product_info[0].quantity).toEqual(2);
+                    expect(order.product_info[0].price).toEqual(20);
                     return [2 /*return*/];
             }
         });
     }); });
     it('get  All order for one user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var result;
+        var result, order;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
@@ -325,7 +332,14 @@ describe('order Test', function () {
                         .set('authorization', clientToken)];
                 case 1:
                     result = _a.sent();
+                    order = result.body.result;
                     expect(result.status).toEqual(200);
+                    expect(order[0].order_id).toEqual(1);
+                    expect(order[0].total_price).toEqual('68.00');
+                    expect(order[0].product_info[0].product_id).toEqual(1);
+                    expect(order[0].product_info[0].product_name).toEqual('Apple');
+                    expect(order[0].product_info[0].quantity).toEqual(2);
+                    expect(order[0].product_info[0].price).toEqual(20);
                     return [2 /*return*/];
             }
         });

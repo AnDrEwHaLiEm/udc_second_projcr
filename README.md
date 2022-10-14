@@ -5,36 +5,33 @@ db port number = 5432
 Database setup =>{
     CREATE DATABASE udc_second_project;
     CREATE DATABASE udc_second_project_test;
-
 }
 
 Environment variables =>{
-    POSTGRES_HOST
-    POSTGRES_DB
-    POSTGRES_TEST_DB
-    POSTGRES_USER
-    POSTGRES_PASSWORD
-    PRIVATE_KEY
-    ENV
+
+    POSTGRES_HOST = 127.0.0.1
+    POSTGRES_DB = udc_second_project
+    POSTGRES_TEST_DB = udc_second_project_test
+    POSTGRES_USER = postgres
+    POSTGRES_PASSWORD = postgres
+    PRIVATE_KEY = 
+    eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2NTQ5OTk2NiwiaWF0IjoxNjY1NDk5OTY2fQ.29ULaWLQCw6q_WhmsYS9f7V4Z_toNJ-Y1KSHFZP9yVQ
+    ENV=dev
 }
 
 
 
 Package installation instructions =>{
-    
-    (npm run test) to build test dataBase and build then jasmine will run
-    (npm run destroy) to destroy test dataBase
-
-    "scripts": {
-        "build": "npx tsc",
-        "start": "nodemon src/index.ts",
-        "jasmin":"jasmine",
-        "dev-server": "tsc-watch --noClear -p ./src/tsconfig.json --onSuccess \"node ./dist/index.js\"",
-        "migrate": "db-migrate --env test up && db-migrate up",
-        "test": "ENV=test db-migrate --env test up && npm run build && npm run jasmin",
-        "destroy":"db-migrate db:drop test",
-        "lint": "eslint . --ext .ts",
-        "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
+        "scripts": {
+          "build": "npx tsc",
+          "start": "nodemon src/index.ts",
+          "jasmin":"jasmine",
+          "dev-server": "tsc-watch --noClear -p ./src/tsconfig.json --onSuccess \"node ./dist/index.js\"",
+          "migrate": "db-migrate --env test up && db-migrate up",
+          destroy":"db-migrate --env test reset",
+          "test": "ENV=test db-migrate --env test up && npm run build && npm run jasmin && npm run destroy",
+          "lint": "eslint . --ext .ts",
+          "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
@@ -73,144 +70,6 @@ Package installation instructions =>{
 }
 
 Setup db and server instructions --> postgres database
-
-Database schema with column name and type =>{
-    user{
-        user_id SERIAL PRIMARY KEY,
-        user_name VARCHAR(50),
-        user_password VARCHAR(200),
-        user_email VARCHAR(255) UNIQUE,
-        admin_authority VARCHAR(10) CHECK (admin_authority IN('admin', 'client'))
-    }
-    products{
-        product_id SERIAL PRIMARY KEY,
-        product_name VARCHAR(20),
-        product_quantity INT,
-        product_price  DECIMAL,
-    }
-    orders{
-         order_id SERIAL PRIMARY KEY,
-         user_id INT,
-         total_price DECIMAL(12,2),
-         foreign key (user_id) references users(user_id) ON DELETE CASCADE
-    }
-    order_product{
-        order_id  INT,
-        product_id INT,
-        quantity INT,
-        price DECIMAL(12,2),
-        PRIMARY KEY(order_id,product_id),
-        foreign key (order_id) references orders(order_id) ON DELETE CASCADE,
-        foreign key (product_id) references products(product_id) ON DELETE CASCADE
-    }
-}
-
-End Point--->{
-    user API
-    {
-        log in 
-        {
-            POST/login
-            body{
-                user_email:string
-                password:string 
-            } ==> 
-            (user_email = admin@admin.com  , password  = admin) 
-            OR
-            (user_email = an.roooof@gmail.com  , password  = admin) ==> (create Default)
-        }
-        sign up
-        {
-            POST/user/signup
-            body{
-                 user_name: string,
-                 admin_authority: string , ==> {client Or admin}
-                 user_email: string,
-                 user_password: string
-            }
-        }
-    }
-    product API
-    {
-        add new Product
-        {
-            POST/product/create
-            body
-            {
-                product_name: string,
-                product_price: number,
-                product_quantity: number,
-            }
-            header{
-                'authorization' : adminToken  ===> adminToken should start with '123=' then token that come to you when log in
-            }
-        }
-        edit exist product
-        {
-            PUT/product/edit
-            body
-            {
-                product_id: string,
-                product_name: string,
-                product_price: number,
-                product_quantity: number,
-            }
-            header{
-                'authorization' : adminToken  ===> adminToken should start with '123=' then token that come to you when log in
-            }
-        }
-        delete Product{
-            DELETE/product/delete/:_id
-            header{
-                'authorization' : adminToken  ===> adminToken should start with '123=' then token that come to you when log in
-            }
-        }
-        get All {
-           GET/product/getAll ==> Any One Can see ALl Product
-    
-        }
-        getOne{
-           GET/product/getOne/:_id   ==>Any One can get One Product
-        }
-    }
-    
-    Order{
-        add new product
-        {
-            POST/order/add
-            body
-            { 
-                products: [
-                    { product_id: number, product_quantity: number },
-                ],
-            }
-            header
-            {
-                'authorization' : clientToken  ===> clientToken should start with '123=' then token that come to you when log in
-                ===> (must be a client not admin)
-            }
-        }
-        get One Order
-        {
-            GET/order/getOne/:order_id
-            header
-            {
-                'authorization' : clientToken  ===> clientToken should start with '123=' then token that come to you when log in
-                ===> (must be a client not admin)
-            }
-        }
-        get All Order for one user
-        {
-            GET/order/getAll
-            header
-            {
-                'authorization' : clientToken  ===> clientToken should start with '123=' then token that come to you when log in
-                ===> (must be a client not admin)
-            }
-        }
-
-    }
-}
 
 </pre>
 

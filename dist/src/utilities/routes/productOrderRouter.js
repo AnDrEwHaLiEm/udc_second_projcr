@@ -43,37 +43,26 @@ var express_1 = __importDefault(require("express"));
 var order_1 = __importDefault(require("../process/order"));
 var orderRouter = express_1.default.Router();
 orderRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, order_1.default.addNewProduct(req)];
-            case 1:
-                result = _a.sent();
-                return [2 /*return*/, res.status(result.state).send(result.text)];
+            case 0: return [4 /*yield*/, order_1.default.addNewProduct(req, res)];
+            case 1: return [2 /*return*/, void (_a.sent())];
         }
     });
 }); });
 orderRouter.get('/getOne/:order_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, order_1.default.getOne(req)];
-            case 1:
-                result = _a.sent();
-                if (result.order_id === '-1')
-                    return [2 /*return*/, res.status(404).send('Not Found')];
-                return [2 /*return*/, res.send(result)];
+            case 0: return [4 /*yield*/, order_1.default.getOne(req, res)];
+            case 1: return [2 /*return*/, void (_a.sent())];
         }
     });
 }); });
 orderRouter.get('/getAll', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, order_1.default.getAll(req)];
-            case 1:
-                result = _a.sent();
-                return [2 /*return*/, res.send(result)];
+            case 0: return [4 /*yield*/, order_1.default.getAll(req, res)];
+            case 1: return [2 /*return*/, void (_a.sent())];
         }
     });
 }); });

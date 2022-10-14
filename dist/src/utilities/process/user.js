@@ -40,27 +40,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
-var DefaultRespons_1 = __importDefault(require("../DefaultRespons"));
 var dataBase_1 = require("../../dataBase");
 var User = /** @class */ (function () {
     function User() {
     }
-    /*async deleteModelsById(req: Request): Promise<DefaultResponseInterface> {
-      const returnResponse = new DefaultRespons();
-      try {
-        const { _ids } = req.params;
-        const query = `DELETE from users WHERE user_id IN (${_ids});`;
-        const conn = await client.connect();
-  
-        await conn.query(query);
-        returnResponse.text = "Deleted";
-        return returnResponse;
-      } catch (error) {
-        returnResponse.state = 400;
-        returnResponse.text = `Error Operation ${error}`;
-        return returnResponse;
-      }
-    }*/
     User.prototype.bcryptPassword = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
             var user_password, hashPassword;
@@ -110,33 +93,27 @@ var User = /** @class */ (function () {
             });
         });
     };
-    User.prototype.createNewUser = function (req) {
+    User.prototype.createNewUser = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var res, _a, user_name, user_email, user_password, admin_authority, query, conn, error_1;
+            var _a, user_name, user_email, user_password, admin_authority, query, conn, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        res = new DefaultRespons_1.default();
-                        _b.label = 1;
-                    case 1:
-                        _b.trys.push([1, 4, , 5]);
+                        _b.trys.push([0, 3, , 4]);
                         _a = req.body, user_name = _a.user_name, user_email = _a.user_email, user_password = _a.user_password, admin_authority = _a.admin_authority;
                         query = "INSERT INTO users(user_name,user_email,user_password,admin_authority) VALUES (\n                            '".concat(user_name, "', '").concat(user_email, "', '").concat(user_password, "', '").concat(admin_authority, "');");
                         return [4 /*yield*/, dataBase_1.client.connect()];
-                    case 2:
+                    case 1:
                         conn = _b.sent();
                         return [4 /*yield*/, conn.query(query)];
-                    case 3:
+                    case 2:
                         _b.sent();
                         conn.release();
-                        res.text = 'Success';
-                        return [2 /*return*/, res];
-                    case 4:
+                        return [2 /*return*/, res.send('Success')];
+                    case 3:
                         error_1 = _b.sent();
-                        res.state = 400;
-                        res.text = "error ".concat(error_1);
-                        return [2 /*return*/, res];
-                    case 5: return [2 /*return*/];
+                        return [2 /*return*/, res.status(400).send("error ".concat(error_1))];
+                    case 4: return [2 /*return*/];
                 }
             });
         });

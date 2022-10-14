@@ -99,22 +99,23 @@ describe('Product Tests', () => {
 
   it('any One show Products', async () => {
     const response = await request.get('/product/getAll');
+    const product = response.body.result[0];
     expect(response.status).toEqual(200);
-    expect(response.body.length).toBeTruthy();
-    expect(response.body[0].product_id).toBeTruthy();
-    expect(response.body[0].product_name).toBeTruthy();
-    expect(response.body[0].product_price).toBeTruthy();
-    expect(response.body[0].product_quantity).toBeTruthy();
+    expect(response.body.result.length).toEqual(4);
+    expect(product.product_id).toEqual(1);
+    expect(product.product_name).toEqual('Apple');
+    expect(product.product_price).toEqual('10.00');
+    expect(product.product_quantity).toEqual(60);
   });
 
   it('Any One get Exist One Product', async () => {
     const response = await request.get(`/product/getOne/1`);
+    const product = response.body.result;
     expect(response.status).toEqual(200);
-    expect(response.body.product_id).toEqual(1);
-    expect(response.body.product_name).toEqual('Apple');
-    expect(response.body.product_price).toEqual('10.00');
-    expect(response.body.product_quantity).toBeLessThanOrEqual(60);
-    expect(response.body.product_quantity).toBeGreaterThanOrEqual(0);
+    expect(product.product_id).toEqual(1);
+    expect(product.product_name).toEqual('Apple');
+    expect(product.product_price).toEqual('10.00');
+    expect(product.product_quantity).toEqual(60);
   });
 
   it('Any One get Not Exist One Product', async () => {
@@ -154,18 +155,30 @@ describe('order Test', () => {
       .set('authorization', clientToken);
     expect(result.status).toEqual(200);
   });
-
   it('get one order ', async () => {
     const result = await request
       .get(`/order/getOne/1`)
       .set('authorization', clientToken);
+    const order = result.body.result;
     expect(result.status).toEqual(200);
+    expect(order.total_price).toEqual('68.00');
+    expect(order.product_info[0].product_id).toEqual(1);
+    expect(order.product_info[0].product_name).toEqual('Apple');
+    expect(order.product_info[0].quantity).toEqual(2);
+    expect(order.product_info[0].price).toEqual(20);
   });
 
   it('get  All order for one user', async () => {
     const result = await request
       .get(`/order/getAll`)
       .set('authorization', clientToken);
+    const order = result.body.result;
     expect(result.status).toEqual(200);
+    expect(order[0].order_id).toEqual(1);
+    expect(order[0].total_price).toEqual('68.00');
+    expect(order[0].product_info[0].product_id).toEqual(1);
+    expect(order[0].product_info[0].product_name).toEqual('Apple');
+    expect(order[0].product_info[0].quantity).toEqual(2);
+    expect(order[0].product_info[0].price).toEqual(20);
   });
 });

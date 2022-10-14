@@ -6,13 +6,8 @@ userCreateAccountRouter.post(
   '/signup',
   user.checkEmailAvailabilty,
   user.bcryptPassword,
-  async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const defaultRespons = await user.createNewUser(req);
-      return res.status(defaultRespons.state).send(defaultRespons.text);
-    } catch (error) {
-      return res.status(400).send(error);
-    }
+  async (req: Request, res: Response): Promise<void> => {
+    return void (await user.createNewUser(req, res));
   }
 );
 

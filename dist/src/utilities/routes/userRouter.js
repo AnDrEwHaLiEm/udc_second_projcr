@@ -43,19 +43,10 @@ var express_1 = __importDefault(require("express"));
 var user_1 = __importDefault(require("../process/user"));
 var userCreateAccountRouter = express_1.default.Router();
 userCreateAccountRouter.post('/signup', user_1.default.checkEmailAvailabilty, user_1.default.bcryptPassword, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var defaultRespons, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, user_1.default.createNewUser(req)];
-            case 1:
-                defaultRespons = _a.sent();
-                return [2 /*return*/, res.status(defaultRespons.state).send(defaultRespons.text)];
-            case 2:
-                error_1 = _a.sent();
-                return [2 /*return*/, res.status(400).send(error_1)];
-            case 3: return [2 /*return*/];
+            case 0: return [4 /*yield*/, user_1.default.createNewUser(req, res)];
+            case 1: return [2 /*return*/, void (_a.sent())];
         }
     });
 }); });
