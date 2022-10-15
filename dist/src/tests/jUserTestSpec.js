@@ -39,58 +39,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clientToken = exports.AdminToken = void 0;
 var supertest_1 = __importDefault(require("supertest"));
 var __1 = __importDefault(require(".."));
 var request = (0, supertest_1.default)(__1.default);
-var AdminToken = '123=';
-exports.AdminToken = AdminToken;
-var clientToken = '123=';
-exports.clientToken = clientToken;
-describe('log in EndPint', function () {
-    it('login with main admin', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
+describe('user Tests', function () {
+    it('create new user', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var userData, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    req = { user_email: 'admin@admin.com', password: 'admin' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
+                    userData = {
+                        user_name: 'Andrew',
+                        admin_authority: 'client',
+                        user_email: 'andrew@gmail.com',
+                        user_password: '123456',
+                    };
+                    return [4 /*yield*/, request.post('/user/signup').send(userData)];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(200);
-                    exports.AdminToken = AdminToken += response.body.token;
-                    expect(response.body.token).toBeTruthy();
+                    expect(response.text).toEqual('Success');
                     return [2 /*return*/];
             }
         });
     }); });
-    it('login with new user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
+    it('create exist user', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var userData, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    req = { user_email: 'an.roooof@gmail.com', password: 'admin' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
+                    userData = {
+                        user_name: 'Andrew',
+                        admin_authority: 'client',
+                        user_email: 'an.roooof@gmail.com',
+                        user_password: '987654',
+                    };
+                    return [4 /*yield*/, request.post('/user/signup').send(userData)];
                 case 1:
                     response = _a.sent();
-                    exports.clientToken = clientToken += response.body.token;
-                    expect(response.status).toEqual(200);
-                    expect(response.body.token).toBeTruthy();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('login with wrong password', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    req = { user_email: 'an.roooof@gmail.com', password: '012456' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toEqual(404);
-                    expect(response.text).toEqual('Email or password is uncorrect');
+                    expect(response.status).toEqual(409);
+                    expect(response.text).toEqual('User is Exist');
                     return [2 /*return*/];
             }
         });

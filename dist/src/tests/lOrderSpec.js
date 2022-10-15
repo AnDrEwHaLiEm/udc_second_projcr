@@ -39,58 +39,71 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clientToken = exports.AdminToken = void 0;
 var supertest_1 = __importDefault(require("supertest"));
 var __1 = __importDefault(require(".."));
+var indexSpec_1 = require("./indexSpec");
 var request = (0, supertest_1.default)(__1.default);
-var AdminToken = '123=';
-exports.AdminToken = AdminToken;
-var clientToken = '123=';
-exports.clientToken = clientToken;
-describe('log in EndPint', function () {
-    it('login with main admin', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
+describe('order Test', function () {
+    it('add new Order', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var req, result;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    req = { user_email: 'admin@admin.com', password: 'admin' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
+                    req = {
+                        products: [
+                            { product_id: 1, product_quantity: 2 },
+                            { product_id: 2, product_quantity: 3 },
+                            { product_id: 3, product_quantity: 4 },
+                        ],
+                    };
+                    return [4 /*yield*/, request
+                            .post('/order/add')
+                            .send(req)
+                            .set('authorization', indexSpec_1.clientToken)];
                 case 1:
-                    response = _a.sent();
-                    expect(response.status).toEqual(200);
-                    exports.AdminToken = AdminToken += response.body.token;
-                    expect(response.body.token).toBeTruthy();
+                    result = _a.sent();
+                    expect(result.status).toEqual(200);
                     return [2 /*return*/];
             }
         });
     }); });
-    it('login with new user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
+    it('get one order ', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result, order;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    req = { user_email: 'an.roooof@gmail.com', password: 'admin' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
+                case 0: return [4 /*yield*/, request
+                        .get("/order/getOne/1")
+                        .set('authorization', indexSpec_1.clientToken)];
                 case 1:
-                    response = _a.sent();
-                    exports.clientToken = clientToken += response.body.token;
-                    expect(response.status).toEqual(200);
-                    expect(response.body.token).toBeTruthy();
+                    result = _a.sent();
+                    order = result.body.result;
+                    expect(result.status).toEqual(200);
+                    expect(order.total_price).toEqual('68.00');
+                    expect(order.product_info[0].product_id).toEqual(1);
+                    expect(order.product_info[0].product_name).toEqual('Apple');
+                    expect(order.product_info[0].quantity).toEqual(2);
+                    expect(order.product_info[0].price).toEqual(20);
                     return [2 /*return*/];
             }
         });
     }); });
-    it('login with wrong password', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
+    it('get  All order for one user', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var result, order;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    req = { user_email: 'an.roooof@gmail.com', password: '012456' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
+                case 0: return [4 /*yield*/, request
+                        .get("/order/getAll")
+                        .set('authorization', indexSpec_1.clientToken)];
                 case 1:
-                    response = _a.sent();
-                    expect(response.status).toEqual(404);
-                    expect(response.text).toEqual('Email or password is uncorrect');
+                    result = _a.sent();
+                    order = result.body.result;
+                    expect(result.status).toEqual(200);
+                    expect(order[0].order_id).toEqual(1);
+                    expect(order[0].total_price).toEqual('68.00');
+                    expect(order[0].product_info[0].product_id).toEqual(1);
+                    expect(order[0].product_info[0].product_name).toEqual('Apple');
+                    expect(order[0].product_info[0].quantity).toEqual(2);
+                    expect(order[0].product_info[0].price).toEqual(20);
                     return [2 /*return*/];
             }
         });
