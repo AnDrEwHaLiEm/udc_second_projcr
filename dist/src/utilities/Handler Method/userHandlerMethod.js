@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var user_1 = __importDefault(require("../Model Method/user"));
 var userRouter = express_1.default.Router();
-var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+userRouter.post('/signup', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var userData, newUser, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -68,6 +68,5 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 4: return [2 /*return*/];
         }
     });
-}); };
-userRouter.post('/signup', create);
+}); });
 exports.default = userRouter;

@@ -28,8 +28,8 @@ Package installation instructions =>{
           "jasmin":"jasmine",
           "dev-server": "tsc-watch --noClear -p ./src/tsconfig.json --onSuccess \"node ./dist/index.js\"",
           "migrate": "db-migrate --env test up && db-migrate up",
-          destroy":"db-migrate --env test reset",
-          "test": "ENV=test db-migrate --env test up && npm run build && npm run jasmin && npm run destroy",
+          "destroy":"db-migrate --env test reset",
+          "test": "ENV=test db-migrate --env test up &&npm run build && ENV=test npm run jasmin&& npm run destroy",
           "lint": "eslint . --ext .ts",
           "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },

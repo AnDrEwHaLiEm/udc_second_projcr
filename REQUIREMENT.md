@@ -15,8 +15,8 @@ Database schema with column name and type =>{
     }
     orders{
          order_id number,
-        user_id number,
-        total_price number
+         user_id number,
+         total_price number
     }
     order_product{
         order_id  number,
@@ -41,6 +41,8 @@ End Point--->{
             (user_email = an.roooof@gmail.com  , password  = admin) ==> (create Default)
             response{
                 token
+                or 
+                Email or password is uncorrect
             }
         }
         sign up
@@ -53,11 +55,15 @@ End Point--->{
                 user_password: string
             }
             response{
-                user_id,
-                user_name,
-                admin_authority,
-                user_email,
-                user_password,
+                {
+                    user_id,
+                    user_name,
+                    admin_authority,
+                    user_email,
+                    user_password,
+                }
+                or 
+                unable to Create User
             }
         }
     }
@@ -77,7 +83,14 @@ End Point--->{
             }
             response{
                 status = 200
-                text = Success
+                body{
+                    product_id,
+                    product_name,
+                    product_price,
+                    product_quantity
+                }
+                or 
+                Unauthorized
             }
         }
         edit exist product
@@ -94,8 +107,15 @@ End Point--->{
                 'authorization' : adminToken  ===> adminToken should start with '123=' then token that come to you when log in
             }
             response{
-                status = 200
-                text = Success
+                 status = 200
+                 body{
+                    product_id,
+                    product_name,
+                    product_price,
+                    product_quantity
+                }
+                or
+                Unauthorized
             }
         }
         delete Product{
@@ -105,19 +125,21 @@ End Point--->{
             }
             response{
                 status = 200
-                text = DELETED
+                body = "DELETED"
+                or
+                Unauthorized || Error when Delete Product
+                    
             }
         }
         get All {
            GET/product/getAll ==> Any One Can see ALl Product
            response{
             status 200
-            result[
+            body[
                 {
-                    product_id:string
-                    product_name:string
-                    product_price:number
-                    product_quantity:number
+                    product_id,
+                    product_name,
+                    product_price,                    product_quantity
                 }
             ]
             }
@@ -128,11 +150,11 @@ End Point--->{
         }
         response{
             status 200
-            result{
-                product_id:string
-                product_name:string
-                product_price:number
-                product_quantity:number
+            body{
+                product_id,
+                product_name,
+                product_price,
+                product_quantity
             }
             or
             status = 404

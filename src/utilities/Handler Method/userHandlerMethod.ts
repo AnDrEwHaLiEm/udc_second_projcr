@@ -3,7 +3,7 @@ import user from '../Model Method/user';
 import { UserModel } from '../model/userModel';
 const userRouter = express.Router();
 
-const create = async (req: Request, res: Response) => {
+userRouter.post('/signup', async (req: Request, res: Response) => {
   const userData: UserModel = {
     user_name: req.body.user_name,
     user_password: req.body.user_password,
@@ -17,8 +17,6 @@ const create = async (req: Request, res: Response) => {
     res.status(409);
     res.json(err);
   }
-};
-
-userRouter.post('/signup', create);
+});
 
 export default userRouter;
