@@ -1,7 +1,7 @@
-export default interface usersModel {
-  user_id: number;
-  user_name: string;
+export type UserModel = {
+  user_id?: number;
+  user_name?: string;
   user_password: string;
   user_email: string;
-  admin_authority: boolean;
-}
+  admin_authority?: string;
+};

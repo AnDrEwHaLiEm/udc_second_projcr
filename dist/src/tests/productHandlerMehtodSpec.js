@@ -41,9 +41,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var supertest_1 = __importDefault(require("supertest"));
 var __1 = __importDefault(require(".."));
-var indexSpec_1 = require("./indexSpec");
+var LoginHandlerMethodSpec_1 = require("./LoginHandlerMethodSpec");
 var request = (0, supertest_1.default)(__1.default);
-describe('product Tests', function () {
+describe('product Tests End Point', function () {
     it('Admin Create  product', function () { return __awaiter(void 0, void 0, void 0, function () {
         var productData, response;
         return __generator(this, function (_a) {
@@ -51,17 +51,19 @@ describe('product Tests', function () {
                 case 0:
                     productData = {
                         product_name: 'Chipsi',
-                        product_price: 100,
+                        product_price: 5,
                         product_quantity: 100,
                     };
                     return [4 /*yield*/, request
                             .post('/product/create')
                             .send(productData)
-                            .set('authorization', indexSpec_1.AdminToken)];
+                            .set('authorization', LoginHandlerMethodSpec_1.AdminToken)];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(200);
-                    expect(response.text).toEqual('Success');
+                    expect(response.body.product_name).toEqual('Chipsi');
+                    expect(response.body.product_price).toEqual('5.00');
+                    expect(response.body.product_quantity).toEqual(100);
                     return [2 /*return*/];
             }
         });
@@ -79,11 +81,11 @@ describe('product Tests', function () {
                     return [4 /*yield*/, request
                             .post('/product/create')
                             .send(productData)
-                            .set('authorization', indexSpec_1.clientToken)];
+                            .set('authorization', LoginHandlerMethodSpec_1.clientToken)];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(401);
-                    expect(response.text).toEqual('Unauthorized');
+                    expect(response.body).toEqual('Unauthorized');
                     return [2 /*return*/];
             }
         });
@@ -96,30 +98,33 @@ describe('product Tests', function () {
                     productData = {
                         product_id: 4,
                         product_name: 'Tiger',
-                        product_price: 100,
-                        product_quantity: 100,
+                        product_price: 6,
+                        product_quantity: 70,
                     };
                     return [4 /*yield*/, request
                             .put('/product/edit')
                             .send(productData)
-                            .set('authorization', indexSpec_1.AdminToken)];
+                            .set('authorization', LoginHandlerMethodSpec_1.AdminToken)];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(200);
+                    expect(response.body.product_name).toEqual('Tiger');
+                    expect(response.body.product_price).toEqual('6.00');
+                    expect(response.body.product_quantity).toEqual(70);
                     return [2 /*return*/];
             }
         });
     }); });
-    it('any One show Products', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('get All Products', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response, product;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get('/product/getAll')];
                 case 1:
                     response = _a.sent();
-                    product = response.body.result[0];
+                    product = response.body[0];
                     expect(response.status).toEqual(200);
-                    expect(response.body.result.length).toEqual(4);
+                    expect(response.body.length).toEqual(4);
                     expect(product.product_id).toEqual(1);
                     expect(product.product_name).toEqual('Apple');
                     expect(product.product_price).toEqual('10.00');
@@ -128,14 +133,14 @@ describe('product Tests', function () {
             }
         });
     }); });
-    it('Any One get Exist One Product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('get One Product', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response, product;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request.get("/product/getOne/1")];
                 case 1:
                     response = _a.sent();
-                    product = response.body.result;
+                    product = response.body;
                     expect(response.status).toEqual(200);
                     expect(product.product_id).toEqual(1);
                     expect(product.product_name).toEqual('Apple');
@@ -145,7 +150,7 @@ describe('product Tests', function () {
             }
         });
     }); });
-    it('Any One get Not Exist One Product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('get Not Exist Product', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -153,7 +158,7 @@ describe('product Tests', function () {
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(404);
-                    expect(response.text).toEqual('Not Found');
+                    expect(response.body).toEqual('Not Found');
                     return [2 /*return*/];
             }
         });
@@ -164,25 +169,26 @@ describe('product Tests', function () {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
                         .delete("/product/delete/4")
-                        .set('authorization', indexSpec_1.AdminToken)];
+                        .set('authorization', LoginHandlerMethodSpec_1.AdminToken)];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(200);
+                    expect(response.body).toEqual('Deleted');
                     return [2 /*return*/];
             }
         });
     }); });
-    it('user delete Product', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('client delete Product', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, request
                         .delete("/product/delete/4")
-                        .set('authorization', indexSpec_1.clientToken)];
+                        .set('authorization', LoginHandlerMethodSpec_1.clientToken)];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toEqual(401);
-                    expect(response.text).toEqual('Unauthorized');
+                    expect(response.body).toEqual('Unauthorized');
                     return [2 /*return*/];
             }
         });

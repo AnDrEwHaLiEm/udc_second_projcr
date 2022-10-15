@@ -34,7 +34,7 @@ End Point--->{
             POST/login
             request.body{
                 user_email:string
-                password:string 
+                user_password:string 
             } ==> 
             (user_email = admin@admin.com  , password  = admin) 
             OR
@@ -53,8 +53,11 @@ End Point--->{
                 user_password: string
             }
             response{
-                status = 200
-                text = Success
+                user_id,
+                user_name,
+                admin_authority,
+                user_email,
+                user_password,
             }
         }
     }

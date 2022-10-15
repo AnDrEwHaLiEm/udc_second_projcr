@@ -39,29 +39,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var authintication_1 = __importDefault(require("../process/authintication"));
-var authRouter = express_1.default.Router();
-authRouter.post('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        try {
-            return [2 /*return*/, authintication_1.default.logIn(req, res)];
-        }
-        catch (error) {
-            return [2 /*return*/, res.status(400).send({ error: error })];
-        }
-        return [2 /*return*/];
-    });
-}); });
-authRouter.post('/authinticate', authintication_1.default.authinticate, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        try {
-            return [2 /*return*/, res.send(req.body.decodedToken)];
-        }
-        catch (error) {
-            return [2 /*return*/, res.status(400).send({ error: error })];
-        }
-        return [2 /*return*/];
-    });
-}); });
-exports.default = authRouter;
+var bcryptjs_1 = __importDefault(require("bcryptjs"));
+var supertest_1 = __importDefault(require("supertest"));
+var __1 = __importDefault(require(".."));
+var request = (0, supertest_1.default)(__1.default);
+describe('user Tests EndPoint', function () {
+    it('create new user', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var userData, response, result, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    userData = {
+                        user_name: 'Andrew',
+                        admin_authority: 'client',
+                        user_email: 'andrew@gmail.com',
+                        user_password: '123456',
+                    };
+                    return [4 /*yield*/, request.post('/user/signup').send(userData)];
+                case 1:
+                    response = _b.sent();
+                    result = response.body;
+                    expect(response.status).toEqual(200);
+                    expect(result.user_name).toEqual('Andrew');
+                    expect(result.user_email).toEqual('andrew@gmail.com');
+                    _a = expect;
+                    return [4 /*yield*/, bcryptjs_1.default.compare('123456', result.user_password)];
+                case 2:
+                    _a.apply(void 0, [_b.sent()]).toBeTrue();
+                    expect(result.admin_authority).toEqual('client');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('create exist user', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var userData, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    userData = {
+                        user_name: 'Andrew',
+                        admin_authority: 'client',
+                        user_email: 'an.roooof@gmail.com',
+                        user_password: '987654',
+                    };
+                    return [4 /*yield*/, request.post('/user/signup').send(userData)];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toEqual(409);
+                    expect(response.body).toBe('unable to Create User');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});

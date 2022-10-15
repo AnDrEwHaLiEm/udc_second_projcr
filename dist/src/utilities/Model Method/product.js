@@ -40,105 +40,120 @@ var dataBase_1 = require("../../dataBase");
 var Product = /** @class */ (function () {
     function Product() {
     }
-    Product.prototype.createNewProduct = function (req, res) {
+    Product.prototype.createNewProduct = function (product) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, product_name, product_price, product_quantity, query, conn, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _b.trys.push([0, 3, , 4]);
-                        _a = req.body, product_name = _a.product_name, product_price = _a.product_price, product_quantity = _a.product_quantity;
-                        query = "INSERT INTO products(product_name,product_price,product_quantity) VALUES ('".concat(product_name, "','").concat(product_price, "','").concat(product_quantity, "');");
-                        return [4 /*yield*/, dataBase_1.client.connect()];
-                    case 1:
-                        conn = _b.sent();
-                        return [4 /*yield*/, conn.query(query)];
-                    case 2:
-                        _b.sent();
-                        conn.release();
-                        return [2 /*return*/, res.send('Success')];
-                    case 3:
-                        error_1 = _b.sent();
-                        return [2 /*return*/, res.status(400).send("Error ".concat(error_1))];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    Product.prototype.edit = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, product_id, product_name, product_price, product_quantity, query, conn, error_2;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _b.trys.push([0, 3, , 4]);
-                        _a = req.body, product_id = _a.product_id, product_name = _a.product_name, product_price = _a.product_price, product_quantity = _a.product_quantity;
-                        query = "UPDATE products SET product_name = '".concat(product_name, "',product_price='").concat(product_price, "',product_quantity='").concat(product_quantity, "' WHERE product_id='").concat(product_id, "';");
-                        return [4 /*yield*/, dataBase_1.client.connect()];
-                    case 1:
-                        conn = _b.sent();
-                        return [4 /*yield*/, conn.query(query)];
-                    case 2:
-                        _b.sent();
-                        conn.release();
-                        return [2 /*return*/, res.send('Success')];
-                    case 3:
-                        error_2 = _b.sent();
-                        return [2 /*return*/, res.status(400).send("Error ".concat(error_2))];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    Product.prototype.delete = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _id, query, conn, error_3;
+            var product_name, product_price, product_quantity, query, conn, result, newProduct, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        _id = req.params._id;
-                        query = "DELETE FROM products WHERE product_id='".concat(_id, "';");
+                        product_name = product.product_name, product_price = product.product_price, product_quantity = product.product_quantity;
+                        query = "INSERT INTO products(product_name,product_price,product_quantity) VALUES ($1,$2,$3) RETURNING *;";
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(query)];
+                        return [4 /*yield*/, conn.query(query, [
+                                product_name,
+                                product_price,
+                                product_quantity,
+                            ])];
                     case 2:
-                        _a.sent();
+                        result = _a.sent();
                         conn.release();
-                        return [2 /*return*/, res.send('DELETED')];
+                        newProduct = result.rows[0];
+                        return [2 /*return*/, newProduct];
                     case 3:
-                        error_3 = _a.sent();
-                        return [2 /*return*/, res.status(400).send("Error ".concat(error_3))];
+                        err_1 = _a.sent();
+                        throw 'unable to Create Product';
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    Product.prototype.getOne = function (req, res) {
+    Product.prototype.edit = function (product) {
         return __awaiter(this, void 0, void 0, function () {
-            var _id, query, conn, result;
+            var product_id, product_name, product_price, product_quantity, query, conn, result, updatedProduct, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _id = req.params._id;
-                        query = "SELECT * FROM products WHERE product_id='".concat(_id, "';");
+                        _a.trys.push([0, 3, , 4]);
+                        product_id = product.product_id, product_name = product.product_name, product_price = product.product_price, product_quantity = product.product_quantity;
+                        query = "UPDATE products SET product_name = $1 ,product_price=$2,product_quantity=$3 WHERE product_id=$4 RETURNING *;";
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(query)];
+                        return [4 /*yield*/, conn.query(query, [
+                                product_name,
+                                product_price,
+                                product_quantity,
+                                product_id,
+                            ])];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        if (result.rows.length) {
-                            return [2 /*return*/, res.send({ result: result.rows[0] })];
-                        }
-                        return [2 /*return*/, res.status(404).send('Not Found')];
+                        updatedProduct = result.rows[0];
+                        return [2 /*return*/, updatedProduct];
+                    case 3:
+                        error_1 = _a.sent();
+                        throw 'unable to Edit Product';
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    Product.prototype.getAll = function (res) {
+    Product.prototype.delete = function (product) {
+        return __awaiter(this, void 0, void 0, function () {
+            var product_id, query, conn, result, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        product_id = product.product_id;
+                        query = "DELETE FROM products WHERE product_id=$1;";
+                        return [4 /*yield*/, dataBase_1.client.connect()];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query(query, [product_id])];
+                    case 2:
+                        result = _a.sent();
+                        conn.release();
+                        if (result.rowCount)
+                            return [2 /*return*/, 'Deleted'];
+                        else
+                            throw 'Error when Delete Product';
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_2 = _a.sent();
+                        throw 'Error when Delete Product';
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Product.prototype.getOne = function (product) {
+        return __awaiter(this, void 0, void 0, function () {
+            var product_id, query, conn, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        product_id = product.product_id;
+                        query = "SELECT * FROM products WHERE product_id=$1;";
+                        return [4 /*yield*/, dataBase_1.client.connect()];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query(query, [product_id])];
+                    case 2:
+                        result = _a.sent();
+                        conn.release();
+                        if (result.rows.length) {
+                            return [2 /*return*/, result.rows[0]];
+                        }
+                        throw 'Not Found';
+                }
+            });
+        });
+    };
+    Product.prototype.getAll = function () {
         return __awaiter(this, void 0, void 0, function () {
             var query, conn, products, result;
             return __generator(this, function (_a) {
@@ -156,7 +171,7 @@ var Product = /** @class */ (function () {
                             var product_id = element.product_id, product_name = element.product_name, product_price = element.product_price, product_quantity = element.product_quantity;
                             return { product_id: product_id, product_name: product_name, product_price: product_price, product_quantity: product_quantity };
                         });
-                        return [2 /*return*/, res.send({ result: result })];
+                        return [2 /*return*/, result];
                 }
             });
         });

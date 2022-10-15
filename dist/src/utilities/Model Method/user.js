@@ -39,50 +39,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.productAdminRouter = exports.productClientRouter = void 0;
-var express_1 = __importDefault(require("express"));
-var product_1 = __importDefault(require("../process/product"));
-var productClientRouter = express_1.default.Router();
-exports.productClientRouter = productClientRouter;
-var productAdminRouter = express_1.default.Router();
-exports.productAdminRouter = productAdminRouter;
-productAdminRouter.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.default.createNewProduct(req, res)];
-            case 1: return [2 /*return*/, void (_a.sent())];
-        }
-    });
-}); });
-productAdminRouter.put('/edit', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.default.edit(req, res)];
-            case 1: return [2 /*return*/, void (_a.sent())];
-        }
-    });
-}); });
-productAdminRouter.delete('/delete/:_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.default.delete(req, res)];
-            case 1: return [2 /*return*/, void (_a.sent())];
-        }
-    });
-}); });
-productClientRouter.get('/getAll', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.default.getAll(res)];
-            case 1: return [2 /*return*/, void (_a.sent())];
-        }
-    });
-}); });
-productClientRouter.get('/getOne/:_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.default.getOne(req, res)];
-            case 1: return [2 /*return*/, void (_a.sent())];
-        }
-    });
-}); });
+var bcryptjs_1 = __importDefault(require("bcryptjs"));
+var dataBase_1 = require("../../dataBase");
+var User = /** @class */ (function () {
+    function User() {
+    }
+    User.prototype.createNewUser = function (u) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user_name, user_email, user_password, admin_authority, hashPassword, query, conn, result, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        user_name = u.user_name, user_email = u.user_email, user_password = u.user_password, admin_authority = u.admin_authority;
+                        hashPassword = bcryptjs_1.default.hashSync(user_password, 10);
+                        query = 'INSERT INTO users(user_name,user_email,user_password,admin_authority) VALUES ($1, $2, $3, $4) RETURNING * ;';
+                        return [4 /*yield*/, dataBase_1.client.connect()];
+                    case 1:
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query(query, [
+                                user_name,
+                                user_email,
+                                hashPassword,
+                                admin_authority,
+                            ])];
+                    case 2:
+                        result = _a.sent();
+                        conn.release();
+                        return [2 /*return*/, result.rows[0]];
+                    case 3:
+                        error_1 = _a.sent();
+                        throw 'unable to Create User';
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return User;
+}());
+var user = new User();
+exports.default = user;

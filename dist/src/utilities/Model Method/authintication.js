@@ -49,7 +49,6 @@ var Authintication = /** @class */ (function () {
         this.getPrivateKey = this.getPrivateKey.bind(this);
         this.logIn = this.logIn.bind(this);
         this.createMyToken = this.createMyToken.bind(this);
-        this.authinticate = this.authinticate.bind(this);
     }
     Authintication.prototype.getPrivateKey = function () {
         var PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -58,70 +57,40 @@ var Authintication = /** @class */ (function () {
     Authintication.prototype.createMyToken = function (decodedToken) {
         var token = jsonwebtoken_1.default.sign(decodedToken, this.getPrivateKey());
         if (!token)
-            throw new Error('internal server error');
+            throw 'internal server error';
         return token;
     };
-    Authintication.prototype.logIn = function (req, res) {
+    Authintication.prototype.logIn = function (u) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, user_email, password, query, conn, user, user_password, passwordIsCorrect, token;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var user_email, user_password, query, conn, user, passwordIsCorrect, token;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _a = req.body, user_email = _a.user_email, password = _a.password;
-                        query = "SELECT user_id,user_password from users WHERE user_email='".concat(user_email, "'");
+                        user_email = u.user_email, user_password = u.user_password;
+                        query = "SELECT user_id,user_password,admin_authority from users WHERE user_email=$1";
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
-                        conn = _b.sent();
-                        return [4 /*yield*/, conn.query(query)];
+                        conn = _a.sent();
+                        return [4 /*yield*/, conn.query(query, [user_email])];
                     case 2:
-                        user = _b.sent();
+                        user = _a.sent();
                         conn.release();
                         if (!user.rows.length) {
-                            return [2 /*return*/, res.status(404).send('Email or password is uncorrect')];
+                            throw 'Email or password is uncorrect';
                         }
-                        user_password = user.rows[0].user_password;
-                        return [4 /*yield*/, bcryptjs_1.default.compare(password, user_password)];
+                        return [4 /*yield*/, bcryptjs_1.default.compare(user_password, user.rows[0].user_password)];
                     case 3:
-                        passwordIsCorrect = _b.sent();
+                        passwordIsCorrect = _a.sent();
                         if (!passwordIsCorrect) {
-                            return [2 /*return*/, res.status(404).send('Email or password is uncorrect')];
+                            throw 'Email or password is uncorrect';
                         }
                         token = this.createMyToken({
                             _id: user.rows[0].user_id,
                             email: user_email,
+                            admin_authority: user.rows[0].admin_authority,
                         });
-                        return [2 /*return*/, res.send({ token: token })];
+                        return [2 /*return*/, { token: token }];
                 }
-            });
-        });
-    };
-    Authintication.prototype.authinticate = function (req, res, next) {
-        return __awaiter(this, void 0, void 0, function () {
-            var authorizationHeader, token, privateKey;
-            var _this = this;
-            return __generator(this, function (_a) {
-                try {
-                    authorizationHeader = req.headers['authorization'];
-                    token = authorizationHeader && authorizationHeader.split('=')[1];
-                    if (!token) {
-                        res.status(401);
-                        return [2 /*return*/];
-                    }
-                    privateKey = this.getPrivateKey();
-                    return [2 /*return*/, jsonwebtoken_1.default.verify(token, privateKey, function (error, decodedToken) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                if (error)
-                                    return [2 /*return*/, res.status(401).send({ error: error })];
-                                req.body.decodedToken = decodedToken;
-                                return [2 /*return*/, next()];
-                            });
-                        }); })];
-                }
-                catch (error) {
-                    res.status(400).send({ error: error });
-                    return [2 /*return*/];
-                }
-                return [2 /*return*/];
             });
         });
     };

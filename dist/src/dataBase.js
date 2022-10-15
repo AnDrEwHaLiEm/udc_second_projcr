@@ -14,7 +14,7 @@ exports.client = client;
 if (ENV === 'test') {
     exports.client = client = new pg_1.Pool({
         host: POSTGRES_HOST,
-        database: POSTGRES_DB,
+        database: POSTGRES_TEST_DB,
         user: POSTGRES_USER,
         password: POSTGRES_PASSWORD,
     });
@@ -22,7 +22,7 @@ if (ENV === 'test') {
 if (ENV === 'dev') {
     exports.client = client = new pg_1.Pool({
         host: POSTGRES_HOST,
-        database: POSTGRES_TEST_DB,
+        database: POSTGRES_DB,
         user: POSTGRES_USER,
         password: POSTGRES_PASSWORD,
     });

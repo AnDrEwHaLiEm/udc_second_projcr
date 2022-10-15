@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import productOrder from '../process/order';
+import productOrder from '../Model Method/order';
 const orderRouter = express.Router();
 
 orderRouter.post('/add', async (req: Request, res: Response): Promise<void> => {

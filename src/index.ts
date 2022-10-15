@@ -1,14 +1,9 @@
 import express from 'express';
-import authRouter from './utilities/routes/authinticationRoutes';
+import authRouter from './utilities/Handler Method/authinticationRoutes';
 import cors from 'cors';
-import userCreateAccountRouter from './utilities/routes/userRouter';
-import authintication from './utilities/process//authintication';
-import checkAuthorty from './utilities/process/checkAuthory';
-import {
-  productClientRouter,
-  productAdminRouter,
-} from './utilities/routes/productRouter';
-import orderRouter from './utilities/routes/productOrderRouter';
+import orderRouter from './utilities/Handler Method/productOrderRouter';
+import userRouter from './utilities/Handler Method/userHandlerMethod';
+import productRouter from './utilities/Handler Method/productRouter';
 
 const app = express();
 const port = 3000;
@@ -17,14 +12,9 @@ app.use(cors());
 
 app.use('/login', authRouter);
 
-app.use('/user', userCreateAccountRouter);
+app.use('/user', userRouter);
 
-app.use('/product', productClientRouter);
-
-app.use(authintication.authinticate);
-app.use(checkAuthorty);
-
-app.use('/product', productAdminRouter);
+app.use('/product', productRouter);
 
 app.use('/order', orderRouter);
 

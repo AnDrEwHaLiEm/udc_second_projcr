@@ -39,60 +39,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clientToken = exports.AdminToken = void 0;
-var supertest_1 = __importDefault(require("supertest"));
-var __1 = __importDefault(require(".."));
-var request = (0, supertest_1.default)(__1.default);
-var AdminToken = '123=';
-exports.AdminToken = AdminToken;
-var clientToken = '123=';
-exports.clientToken = clientToken;
-describe('log in EndPint', function () {
-    it('login with main admin', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    req = { user_email: 'admin@admin.com', password: 'admin' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toEqual(200);
-                    exports.AdminToken = AdminToken += response.body.token;
-                    expect(response.body.token).toBeTruthy();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('login with new user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    req = { user_email: 'an.roooof@gmail.com', password: 'admin' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
-                case 1:
-                    response = _a.sent();
-                    exports.clientToken = clientToken += response.body.token;
-                    expect(response.status).toEqual(200);
-                    expect(response.body.token).toBeTruthy();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('login with wrong password', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var req, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    req = { user_email: 'an.roooof@gmail.com', password: '012456' };
-                    return [4 /*yield*/, request.post('/login').send(req)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toEqual(404);
-                    expect(response.text).toEqual('Email or password is uncorrect');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-});
+var express_1 = __importDefault(require("express"));
+var authintication_1 = __importDefault(require("../Model Method/authintication"));
+var authRouter = express_1.default.Router();
+authRouter.post('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userData, token, err_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                userData = {
+                    user_email: req.body.user_email,
+                    user_password: req.body.user_password,
+                };
+                return [4 /*yield*/, authintication_1.default.logIn(userData)];
+            case 1:
+                token = _a.sent();
+                return [2 /*return*/, res.json(token)];
+            case 2:
+                err_1 = _a.sent();
+                res.status(400);
+                res.json(err_1);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+exports.default = authRouter;

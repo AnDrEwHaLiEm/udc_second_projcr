@@ -40,14 +40,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
-var user_1 = __importDefault(require("../process/user"));
-var userCreateAccountRouter = express_1.default.Router();
-userCreateAccountRouter.post('/signup', user_1.default.checkEmailAvailabilty, user_1.default.bcryptPassword, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var order_1 = __importDefault(require("../Model Method/order"));
+var orderRouter = express_1.default.Router();
+orderRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, user_1.default.createNewUser(req, res)];
+            case 0: return [4 /*yield*/, order_1.default.addNewProduct(req, res)];
             case 1: return [2 /*return*/, void (_a.sent())];
         }
     });
 }); });
-exports.default = userCreateAccountRouter;
+orderRouter.get('/getOne/:order_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, order_1.default.getOne(req, res)];
+            case 1: return [2 /*return*/, void (_a.sent())];
+        }
+    });
+}); });
+orderRouter.get('/getAll', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, order_1.default.getAll(req, res)];
+            case 1: return [2 /*return*/, void (_a.sent())];
+        }
+    });
+}); });
+exports.default = orderRouter;
