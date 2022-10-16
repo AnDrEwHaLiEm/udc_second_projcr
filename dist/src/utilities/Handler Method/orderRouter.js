@@ -41,8 +41,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-var product_1 = __importDefault(require("../Model Method/product"));
-var productRouter = express_1.default.Router();
+var order_1 = __importDefault(require("../Model Method/order"));
+var orderRouter = express_1.default.Router();
 var checkAuthorty = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var privateKey, authorizationHeader, token;
     return __generator(this, function (_a) {
@@ -64,7 +64,7 @@ var checkAuthorty = function (req, res, next) { return __awaiter(void 0, void 0,
                         else {
                             req.body.decodedToken = decodedToken;
                             admin_authority = req.body.decodedToken.admin_authority;
-                            if (admin_authority == 'admin') {
+                            if (admin_authority == 'client') {
                                 next();
                                 return [2 /*return*/];
                             }
@@ -83,20 +83,19 @@ var checkAuthorty = function (req, res, next) { return __awaiter(void 0, void 0,
         return [2 /*return*/];
     });
 }); };
-productRouter.post('/create', checkAuthorty, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var productData, result, err_1;
+orderRouter.post('/add', checkAuthorty, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var orderData, result, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                productData = {
-                    product_name: req.body.product_name,
-                    product_price: req.body.product_price,
-                    product_quantity: req.body.product_quantity,
+                orderData = {
+                    user_id: req.body.decodedToken._id,
+                    product_info: req.body.products,
                 };
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, product_1.default.createNewProduct(productData)];
+                return [4 /*yield*/, order_1.default.addNewProduct(orderData)];
             case 2:
                 result = _a.sent();
                 return [2 /*return*/, res.json(result)];
@@ -109,98 +108,52 @@ productRouter.post('/create', checkAuthorty, function (req, res) { return __awai
         }
     });
 }); });
-productRouter.put('/edit', checkAuthorty, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var productData, result, err_2;
+orderRouter.get('/getOne/:order_id', checkAuthorty, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var orderData, result, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                productData = {
-                    product_id: req.body.product_id,
-                    product_name: req.body.product_name,
-                    product_price: req.body.product_price,
-                    product_quantity: req.body.product_quantity,
+                orderData = {
+                    order_id: req.params.order_id,
                 };
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, product_1.default.edit(productData)];
+                return [4 /*yield*/, order_1.default.getOne(orderData)];
             case 2:
                 result = _a.sent();
-                return [2 /*return*/, res.json(result)];
+                return [2 /*return*/, res.json({ result: result })];
             case 3:
                 err_2 = _a.sent();
-                res.status(400);
+                res.status(404);
                 res.json(err_2);
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); });
-productRouter.delete('/delete/:_id', checkAuthorty, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var productData, result, err_3;
+orderRouter.get('/getAll', checkAuthorty, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var orderData, result, err_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                productData = {
-                    product_id: req.params._id,
+                orderData = {
+                    user_id: req.body.decodedToken._id,
                 };
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, product_1.default.delete(productData)];
+                return [4 /*yield*/, order_1.default.getAll(orderData)];
             case 2:
                 result = _a.sent();
-                return [2 /*return*/, res.json(result)];
+                return [2 /*return*/, res.json({ result: result })];
             case 3:
                 err_3 = _a.sent();
-                res.status(400);
+                res.status(404);
                 res.json(err_3);
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); });
-productRouter.get('/getAll', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, err_4;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, product_1.default.getAll()];
-            case 1:
-                result = _a.sent();
-                return [2 /*return*/, res.json(result)];
-            case 2:
-                err_4 = _a.sent();
-                res.status(400);
-                res.json(err_4);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
-        }
-    });
-}); });
-productRouter.get('/getOne/:_id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var productData, result, err_5;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                productData = {
-                    product_id: req.params._id,
-                };
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, product_1.default.getOne(productData)];
-            case 2:
-                result = _a.sent();
-                return [2 /*return*/, res.json(result)];
-            case 3:
-                err_5 = _a.sent();
-                res.status(404);
-                res.json(err_5);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); });
-exports.default = productRouter;
+exports.default = orderRouter;

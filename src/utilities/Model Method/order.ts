@@ -1,75 +1,83 @@
-import { Request, Response } from 'express';
 import { client } from '../../dataBase';
+import { OrderModel, productInfo } from '../model/orderModel';
 
 class Order {
-  async addProductToOrder(req: Request): Promise<void> {
-    const { products, order_id } = req.body;
+  async addProductToOrder(OrderData: OrderModel): Promise<OrderModel> {
+    const { product_info, order_id } = OrderData;
     let total_price = 0;
     let multiQuery =
       'INSERT INTO order_product(order_id, product_id, quantity, price) VALUES ';
     await Promise.all(
-      products.map(
-        async (element: { product_id: string; product_quantity: number }) => {
-          const { product_id, product_quantity } = element;
-          const query = `SELECT product_price,product_quantity FROM products WHERE product_id='${product_id}';`;
+      (product_info as [productInfo]).map(async (element: productInfo) => {
+        const { product_id, quantity } = element;
+        const query = `SELECT product_price,product_quantity FROM products WHERE product_id='${product_id}';`;
+        const conn = await client.connect();
+        const result = await conn.query(query);
+        conn.release();
+        if (result.rows[0].product_quantity >= quantity && quantity >= 1) {
+          const remender = result.rows[0].product_quantity - quantity;
+          const query = `UPDATE products SET product_quantity='${remender}' WHERE product_id='${product_id}';`;
           const conn = await client.connect();
-          const result = await conn.query(query);
+          await conn.query(query);
           conn.release();
-          if (
-            result.rows[0].product_quantity >= product_quantity &&
-            product_quantity >= 1
-          ) {
-            const remender = result.rows[0].product_quantity - product_quantity;
-            const query = `UPDATE products SET product_quantity='${remender}' WHERE product_id='${product_id}';`;
-            const conn = await client.connect();
-            await conn.query(query);
-            conn.release();
-            const { product_price } = result.rows[0];
-            const price = product_quantity * product_price;
-            total_price += price;
-            multiQuery +=
-              "('" +
-              order_id +
-              "','" +
-              product_id +
-              "','" +
-              product_quantity +
-              "','" +
-              price +
-              "'),";
-          }
+          const { product_price } = result.rows[0];
+          const price = quantity * product_price;
+          total_price += price;
+          multiQuery +=
+            "('" +
+            order_id +
+            "','" +
+            product_id +
+            "','" +
+            quantity +
+            "','" +
+            price +
+            "'),";
         }
-      )
+      })
     );
-    multiQuery = multiQuery.slice(0, -1) + ';';
+    multiQuery = multiQuery.slice(0, -1) + ' RETURNING *;';
     const conn = await client.connect();
-    await conn.query(multiQuery);
+    const result = await conn.query(multiQuery);
     conn.release();
-    req.body.total_price = total_price;
+    const orderProductData: OrderModel = {
+      user_id: OrderData.user_id,
+      order_id: OrderData.order_id,
+      total_price: total_price,
+      product_info: result.rows as Array<productInfo>,
+    };
+    return orderProductData;
   }
 
-  async addNewProduct(req: Request, res: Response): Promise<Response> {
+  async addNewProduct(orderData: OrderModel): Promise<OrderModel> {
     try {
-      const { _id } = req.body.decodedToken;
-      const query = `INSERT INTO orders(user_id) Values('${_id}') RETURNING order_id;`;
+      const { user_id } = orderData;
+      const query = `INSERT INTO orders(user_id) Values($1) RETURNING order_id;`;
       const conn = await client.connect();
-      const result = await conn.query(query);
+      const result = await conn.query(query, [user_id]);
       conn.release();
-      req.body.order_id = result.rows[0].order_id;
-      await this.addProductToOrder(req);
-      const secondQuery = `UPDATE orders SET total_price =${req.body.total_price} WHERE order_id ='${req.body.order_id}';`;
+      orderData.order_id = result.rows[0].order_id;
+      const orderProduct: OrderModel = await this.addProductToOrder(orderData);
+      const secondQuery = `UPDATE orders SET total_price='${orderProduct.total_price}' WHERE order_id='${orderProduct.order_id}' RETURNING *;`;
       const conn2 = await client.connect();
-      await conn2.query(secondQuery);
+      const result2 = await conn2.query(secondQuery);
       conn2.release();
-      return res.send('Success');
+      const orderProductResult: OrderModel = {
+        user_id: result2.rows[0].user_id,
+        order_id: result2.rows[0].order_id,
+        total_price: result2.rows[0].total_price,
+        product_info: orderProduct.product_info,
+      };
+      return orderProductResult;
     } catch (error) {
-      return res.status(400).send(`error ${error}`);
+      throw `${error}`;
     }
   }
 
-  async getAll(req: Request, res: Response): Promise<Response> {
-    const { _id } = req.body.decodedToken;
-    const query = `SELECT orders.order_id,orders.total_price,jsonb_agg(
+  async getAll(orderData: OrderModel): Promise<Array<OrderModel>> {
+    try {
+      const { user_id } = orderData;
+      const query = `SELECT orders.order_id,orders.user_id,orders.total_price,jsonb_agg(
     JSON_BUILD_OBJECT(
 		'product_id',order_product.product_id,
 		'product_name',products.product_name,
@@ -77,17 +85,20 @@ class Order {
 		'price',order_product.price
     )) as product_info FROM orders
     INNER JOIN order_product ON order_product.order_id = orders.order_id
-    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.user_id = '${_id}'
+    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.user_id = $1
     GROUP  BY orders.order_id,orders.total_price;`;
-    const conn = await client.connect();
-    const result = await conn.query(query);
-    conn.release();
-    return res.send({ result: result.rows });
+      const conn = await client.connect();
+      const result = await conn.query(query, [user_id]);
+      conn.release();
+      return result.rows;
+    } catch (error) {
+      throw `Error ${error}`;
+    }
   }
 
-  async getOne(req: Request, res: Response): Promise<Response> {
-    const { order_id } = req.params;
-    const query = `SELECT orders.order_id,orders.total_price,jsonb_agg(
+  async getOne(orderData: OrderModel): Promise<OrderModel> {
+    const { order_id } = orderData;
+    const query = `SELECT orders.order_id,orders.user_id,orders.total_price,jsonb_agg(
     JSON_BUILD_OBJECT(
 		'product_id',order_product.product_id,
 		'product_name',products.product_name,
@@ -95,17 +106,17 @@ class Order {
 		'price',order_product.price
     )) as product_info FROM orders
     INNER JOIN order_product ON order_product.order_id = orders.order_id
-    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.order_id = '${order_id}'
+    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.order_id = $1
     GROUP  BY orders.order_id,orders.total_price;`;
     const conn = await client.connect();
-    const result = await conn.query(query);
+    const result = await conn.query(query, [order_id]);
     conn.release();
     if (result.rows.length) {
-      return res.send({ result: result.rows[0] });
+      return result.rows[0];
     }
-    return res.status(404).send('Not Found');
+    throw 'Not Found';
   }
 }
 
-const productOrder = new Order();
-export default productOrder;
+const order = new Order();
+export default order;

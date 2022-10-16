@@ -179,7 +179,12 @@ End Point--->{
             }
             response{
                 status 200
-                text Success
+                body{
+                    order_id: number,
+                    user_id: number,
+                    total_price: double,
+                    product_info: [{ order_id: number, product_id: number, quantity: number, price: double }]
+                }
             }
         }
         get One Order
@@ -201,6 +206,9 @@ End Point--->{
                         price:string
                     }
                 }
+                or 
+                status = 404
+                body = "Not Found"
             }
         }
         get All Order for one user
@@ -213,13 +221,17 @@ End Point--->{
             }
             response{
                 result [
-                    order_id"string
-                    total_price:number
-                    product_info{
-                        product_id:string
-                        product_name:string
-                        quantity:string
-                        price:string
+                    order_id : number,
+                    user_id:number,
+                    total_price:number,
+                    product_info[
+                            {
+                                product_id:string
+                                product_name:string
+                                quantity:string
+                                price:string
+                            }
+                        ]
                     }
                 ]
             }

@@ -40,22 +40,22 @@ var dataBase_1 = require("../../dataBase");
 var Order = /** @class */ (function () {
     function Order() {
     }
-    Order.prototype.addProductToOrder = function (req) {
+    Order.prototype.addProductToOrder = function (OrderData) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, products, order_id, total_price, multiQuery, conn;
+            var product_info, order_id, total_price, multiQuery, conn, result, orderProductData;
             var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _a = req.body, products = _a.products, order_id = _a.order_id;
+                        product_info = OrderData.product_info, order_id = OrderData.order_id;
                         total_price = 0;
                         multiQuery = 'INSERT INTO order_product(order_id, product_id, quantity, price) VALUES ';
-                        return [4 /*yield*/, Promise.all(products.map(function (element) { return __awaiter(_this, void 0, void 0, function () {
-                                var product_id, product_quantity, query, conn, result, remender, query_1, conn_1, product_price, price;
+                        return [4 /*yield*/, Promise.all(product_info.map(function (element) { return __awaiter(_this, void 0, void 0, function () {
+                                var product_id, quantity, query, conn, result, remender, query_1, conn_1, product_price, price;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0:
-                                            product_id = element.product_id, product_quantity = element.product_quantity;
+                                            product_id = element.product_id, quantity = element.quantity;
                                             query = "SELECT product_price,product_quantity FROM products WHERE product_id='".concat(product_id, "';");
                                             return [4 /*yield*/, dataBase_1.client.connect()];
                                         case 1:
@@ -64,9 +64,8 @@ var Order = /** @class */ (function () {
                                         case 2:
                                             result = _a.sent();
                                             conn.release();
-                                            if (!(result.rows[0].product_quantity >= product_quantity &&
-                                                product_quantity >= 1)) return [3 /*break*/, 5];
-                                            remender = result.rows[0].product_quantity - product_quantity;
+                                            if (!(result.rows[0].product_quantity >= quantity && quantity >= 1)) return [3 /*break*/, 5];
+                                            remender = result.rows[0].product_quantity - quantity;
                                             query_1 = "UPDATE products SET product_quantity='".concat(remender, "' WHERE product_id='").concat(product_id, "';");
                                             return [4 /*yield*/, dataBase_1.client.connect()];
                                         case 3:
@@ -76,7 +75,7 @@ var Order = /** @class */ (function () {
                                             _a.sent();
                                             conn_1.release();
                                             product_price = result.rows[0].product_price;
-                                            price = product_quantity * product_price;
+                                            price = quantity * product_price;
                                             total_price += price;
                                             multiQuery +=
                                                 "('" +
@@ -84,7 +83,7 @@ var Order = /** @class */ (function () {
                                                     "','" +
                                                     product_id +
                                                     "','" +
-                                                    product_quantity +
+                                                    quantity +
                                                     "','" +
                                                     price +
                                                     "'),";
@@ -94,102 +93,118 @@ var Order = /** @class */ (function () {
                                 });
                             }); }))];
                     case 1:
-                        _b.sent();
-                        multiQuery = multiQuery.slice(0, -1) + ';';
+                        _a.sent();
+                        multiQuery = multiQuery.slice(0, -1) + ' RETURNING *;';
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 2:
-                        conn = _b.sent();
+                        conn = _a.sent();
                         return [4 /*yield*/, conn.query(multiQuery)];
                     case 3:
-                        _b.sent();
+                        result = _a.sent();
                         conn.release();
-                        req.body.total_price = total_price;
-                        return [2 /*return*/];
+                        orderProductData = {
+                            user_id: OrderData.user_id,
+                            order_id: OrderData.order_id,
+                            total_price: total_price,
+                            product_info: result.rows,
+                        };
+                        return [2 /*return*/, orderProductData];
                 }
             });
         });
     };
-    Order.prototype.addNewProduct = function (req, res) {
+    Order.prototype.addNewProduct = function (orderData) {
         return __awaiter(this, void 0, void 0, function () {
-            var _id, query, conn, result, secondQuery, conn2, error_1;
+            var user_id, query, conn, result, orderProduct, secondQuery, conn2, result2, orderProductResult, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 6, , 7]);
-                        _id = req.body.decodedToken._id;
-                        query = "INSERT INTO orders(user_id) Values('".concat(_id, "') RETURNING order_id;");
+                        user_id = orderData.user_id;
+                        query = "INSERT INTO orders(user_id) Values($1) RETURNING order_id;";
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(query)];
+                        return [4 /*yield*/, conn.query(query, [user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        req.body.order_id = result.rows[0].order_id;
-                        return [4 /*yield*/, this.addProductToOrder(req)];
+                        orderData.order_id = result.rows[0].order_id;
+                        return [4 /*yield*/, this.addProductToOrder(orderData)];
                     case 3:
-                        _a.sent();
-                        secondQuery = "UPDATE orders SET total_price =".concat(req.body.total_price, " WHERE order_id ='").concat(req.body.order_id, "';");
+                        orderProduct = _a.sent();
+                        secondQuery = "UPDATE orders SET total_price='".concat(orderProduct.total_price, "' WHERE order_id='").concat(orderProduct.order_id, "' RETURNING *;");
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 4:
                         conn2 = _a.sent();
                         return [4 /*yield*/, conn2.query(secondQuery)];
                     case 5:
-                        _a.sent();
+                        result2 = _a.sent();
                         conn2.release();
-                        return [2 /*return*/, res.send('Success')];
+                        orderProductResult = {
+                            user_id: result2.rows[0].user_id,
+                            order_id: result2.rows[0].order_id,
+                            total_price: result2.rows[0].total_price,
+                            product_info: orderProduct.product_info,
+                        };
+                        return [2 /*return*/, orderProductResult];
                     case 6:
                         error_1 = _a.sent();
-                        return [2 /*return*/, res.status(400).send("error ".concat(error_1))];
+                        throw "".concat(error_1);
                     case 7: return [2 /*return*/];
                 }
             });
         });
     };
-    Order.prototype.getAll = function (req, res) {
+    Order.prototype.getAll = function (orderData) {
         return __awaiter(this, void 0, void 0, function () {
-            var _id, query, conn, result;
+            var user_id, query, conn, result, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _id = req.body.decodedToken._id;
-                        query = "SELECT orders.order_id,orders.total_price,jsonb_agg(\n    JSON_BUILD_OBJECT(\n\t\t'product_id',order_product.product_id,\n\t\t'product_name',products.product_name,\n\t\t'quantity',order_product.quantity,\n\t\t'price',order_product.price\n    )) as product_info FROM orders\n    INNER JOIN order_product ON order_product.order_id = orders.order_id\n    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.user_id = '".concat(_id, "'\n    GROUP  BY orders.order_id,orders.total_price;");
+                        _a.trys.push([0, 3, , 4]);
+                        user_id = orderData.user_id;
+                        query = "SELECT orders.order_id,orders.user_id,orders.total_price,jsonb_agg(\n    JSON_BUILD_OBJECT(\n\t\t'product_id',order_product.product_id,\n\t\t'product_name',products.product_name,\n\t\t'quantity',order_product.quantity,\n\t\t'price',order_product.price\n    )) as product_info FROM orders\n    INNER JOIN order_product ON order_product.order_id = orders.order_id\n    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.user_id = $1\n    GROUP  BY orders.order_id,orders.total_price;";
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(query)];
+                        return [4 /*yield*/, conn.query(query, [user_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
-                        return [2 /*return*/, res.send({ result: result.rows })];
+                        return [2 /*return*/, result.rows];
+                    case 3:
+                        error_2 = _a.sent();
+                        throw "Error ".concat(error_2);
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    Order.prototype.getOne = function (req, res) {
+    Order.prototype.getOne = function (orderData) {
         return __awaiter(this, void 0, void 0, function () {
             var order_id, query, conn, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        order_id = req.params.order_id;
-                        query = "SELECT orders.order_id,orders.total_price,jsonb_agg(\n    JSON_BUILD_OBJECT(\n\t\t'product_id',order_product.product_id,\n\t\t'product_name',products.product_name,\n\t\t'quantity',order_product.quantity,\n\t\t'price',order_product.price\n    )) as product_info FROM orders\n    INNER JOIN order_product ON order_product.order_id = orders.order_id\n    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.order_id = '".concat(order_id, "'\n    GROUP  BY orders.order_id,orders.total_price;");
+                        order_id = orderData.order_id;
+                        query = "SELECT orders.order_id,orders.user_id,orders.total_price,jsonb_agg(\n    JSON_BUILD_OBJECT(\n\t\t'product_id',order_product.product_id,\n\t\t'product_name',products.product_name,\n\t\t'quantity',order_product.quantity,\n\t\t'price',order_product.price\n    )) as product_info FROM orders\n    INNER JOIN order_product ON order_product.order_id = orders.order_id\n    INNER JOIN products ON products.product_id =order_product.product_id WHERE orders.order_id = $1\n    GROUP  BY orders.order_id,orders.total_price;";
                         return [4 /*yield*/, dataBase_1.client.connect()];
                     case 1:
                         conn = _a.sent();
-                        return [4 /*yield*/, conn.query(query)];
+                        return [4 /*yield*/, conn.query(query, [order_id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
                         if (result.rows.length) {
-                            return [2 /*return*/, res.send({ result: result.rows[0] })];
+                            return [2 /*return*/, result.rows[0]];
                         }
-                        return [2 /*return*/, res.status(404).send('Not Found')];
+                        throw 'Not Found';
                 }
             });
         });
     };
     return Order;
 }());
-var productOrder = new Order();
-exports.default = productOrder;
+var order = new Order();
+exports.default = order;

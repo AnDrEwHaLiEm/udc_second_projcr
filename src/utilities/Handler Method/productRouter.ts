@@ -9,29 +9,34 @@ const checkAuthorty = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const privateKey = process.env.PRIVATE_KEY as string;
-  const authorizationHeader = req.headers['authorization'];
-  const token = authorizationHeader && authorizationHeader.split('=')[1];
-  if (!token) {
-    return;
-  }
-  return jwt.verify(token, privateKey, async (err, decodedToken) => {
-    if (err) {
-      res.status(401);
-      res.json('Unauthorized');
-      return;
-    } else {
-      req.body.decodedToken = decodedToken;
-      const { admin_authority } = req.body.decodedToken;
-      if (admin_authority == 'admin') {
-        next();
-        return;
-      }
-      res.status(401);
-      res.json('Unauthorized');
+  try {
+    const privateKey = process.env.PRIVATE_KEY as string;
+    const authorizationHeader = req.headers['authorization'];
+    const token = authorizationHeader && authorizationHeader.split('=')[1];
+    if (!token) {
       return;
     }
-  });
+    return jwt.verify(token, privateKey, async (err, decodedToken) => {
+      if (err) {
+        res.status(401);
+        res.json('Unauthorized');
+        return;
+      } else {
+        req.body.decodedToken = decodedToken;
+        const { admin_authority } = req.body.decodedToken;
+        if (admin_authority == 'admin') {
+          next();
+          return;
+        }
+        res.status(401);
+        res.json('Unauthorized');
+        return;
+      }
+    });
+  } catch (err) {
+    res.status(400);
+    res.json(`error ${err}`);
+  }
 };
 
 productRouter.post(
